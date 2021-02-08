@@ -22,6 +22,7 @@
 #include <vector>
 #include <map>
 #include <stdexcept>
+#include <iostream>
 
 /**
  * @brief Preprocessing step. This function gets automatically called when calling TransformerBase's 
@@ -69,7 +70,7 @@ void TestTransformer::convert(){
     while(true){
       auto line = getConvertedLine();
       if(line.empty()){
-        break;
+        break; // TODO: you can do better than that
       }
       outStringStream << line;
       linecount++;
@@ -78,8 +79,27 @@ void TestTransformer::convert(){
     outputStream << linecount << " " << alphabetSize << "\n";
     outputStream << outStringStream.str();
   }
+
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
-    // TODO: implement stream mode
+
+    while(true){
+      if(inputStream.eof()){
+        try{
+          inputStream.setstate(std::ios_base::goodbit);
+        }
+        catch(std::ifstream::failure e) {
+          std::cerr << "Exception opening/reading/closing file\n";
+        }
+      }
+      else{
+        auto line = getConvertedLine(); 
+        if(line.empty()){
+          continue;
+        }
+
+        outStringStream << line;
+      }
+    }
   }
   else{
     throw new std::invalid_argument("Requested streaming mode not implemented");

@@ -6,3 +6,7 @@ bin/
 build/
 
 exampleOutput.txt
+
+# some extra files only on this machine
+Data/example_original.txt
+Data/*.py
