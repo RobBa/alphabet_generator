@@ -1,0 +1,25 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+addons:
+  apt:
+    packages:
+      - cppcheck
+jobs: 
+  include: 
+    - os: linux
+      dist: xenial
+    - os: osx
+      osx_image: xcode12.2
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install cppcheck
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+script:
+  - mkdir build && cd build && cmake ..
+  - make
+  - cd .. 
+  - cppcheck --version
+  # TODO: suppressing the syntax error in refinement.cpp, because cppcheck has an internal error. Remove suppression in later versions
+  - cppcheck --quiet --error-exitcode=1 ./source ./Util
