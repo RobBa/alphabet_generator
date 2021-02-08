@@ -1,0 +1,8 @@
+# all invisible files
+.*
+
+# build-directories
+bin/
+build/
+
+exampleOutput.txt
