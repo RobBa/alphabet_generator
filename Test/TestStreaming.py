@@ -15,20 +15,22 @@ def spawn_converter(converter_ini):
   return process
 
 
-def stream_file(infile_path, outfile_path, delay, converter_ini):
+def stream_file(infile_path, outfile_path, append_output, delay, converter_ini):
   """[Streams the file for the delay (in ms) amount. Each delay another line is written from
       infile to outfile]
 
   Args:
-      infile_path ([str]): [Path to the input file]
-      outfile_path ([str]): [Path to the output file]
-      delay ([float]): [Delay in ms]
+      infile_path ([str]): [Path to the input file.]
+      outfile_path ([str]): [Path to the output file.]
+      append_output ([bool]): [Output will be appended to file, if it exists.]
+      delay ([float]): [Delay in ms.]
+      converter_ini ([str]): [Path to the .ini-file of the AlphabetConverter.]
   """
 
   converter_started = False
 
   infile = open(infile_path, 'r')
-  if path.exists(outfile_path):
+  if path.exists(outfile_path) and append_output:
     print("Output-file already exists. Append to the end.")
     outfile = open(outfile_path, 'a')
   else:
@@ -40,7 +42,6 @@ def stream_file(infile_path, outfile_path, delay, converter_ini):
     time.sleep(delay)
     outfile.write(line)
     line = infile.readline()
-
     if converter_ini and not converter_started:
       process = spawn_converter(converter_ini)
       converter_started = True
@@ -62,8 +63,10 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Emulate streaming of file.')
   parser.add_argument('infile', type=str, help='The path of the input-file.')
-  parser.add_argument('outfile', type=str, help='The path of the output-file. WARNING: Text will be appended if file already exists.')
+  parser.add_argument('outfile', type=str, help='The path of the output-file. WARNING: File will be overwritten if file already exists and \
+                                                 append_output argument not set.')
 
+  parser.add_argument('--append_output', type=bool, default=False, help='If true, then outfile will be appended, rather than overwritten, if it exists.')
   parser.add_argument('--delay', type=float, default=500.0, help='The delay in ms between each new line that will be written.')
   parser.add_argument('--converter_ini', type=str, default=None, help='The path to the .ini-file of the AlphabetConverter. If given,\
                                                                        an instance of the alphabet converter will be launched in a subprocess, \
@@ -73,6 +76,7 @@ if __name__ == "__main__":
   infile_path = args.infile
   outfile_path = args.outfile
 
+  append_output = args.append_output
   delay = args.delay / 1000
   converter_ini = args.converter_ini
 
@@ -81,4 +85,4 @@ if __name__ == "__main__":
   elif converter_ini and not path.exists(converter_ini):
     raise Exception("Invalid path to .ini-file (--converter_ini): ", converter_ini)
 
-  stream_file(infile_path, outfile_path, delay, converter_ini)
+  stream_file(infile_path, outfile_path, append_output, delay, converter_ini)

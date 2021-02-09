@@ -1,9 +1,10 @@
 # all invisible files
 .*
 
-# build-directories
+# directories
 bin/
 build/
+Test/
 
 exampleOutput.txt
 

@@ -86,18 +86,19 @@ void TestTransformer::convert(){
       if(inputStream.eof()){
         try{
           inputStream.setstate(std::ios_base::goodbit);
+          inputStream.clear();
         }
         catch(std::ifstream::failure e) {
           std::cerr << "Exception opening/reading/closing file\n";
         }
       }
       else{
-        auto line = getConvertedLine(); 
+        auto line = getConvertedLine();
         if(line.empty()){
           continue;
         }
 
-        outStringStream << line;
+        outputStream << line;
       }
     }
   }
@@ -128,6 +129,10 @@ std::string TestTransformer::getConvertedLine(){
 
   // convert the lines into a line in abbadingo
   for(auto& line: lines){
+    if(line.empty()){
+      continue;
+    }
+
     const auto& lineSplit = HelperFunctions::splitString(line, true, ' ');
     
     if(lineSplit.at(featureIndexMap[sourceAddressHeader]) == globalParameters.getSrcAddress()){ // TODO: split twice now

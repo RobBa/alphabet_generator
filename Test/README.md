@@ -30,3 +30,5 @@ This folder contains scripts for some testing.
   Hint: When observing the file you'll see that lines will not appear line by line, but rather in
   batches of a few lines. This is due to the buffering of the software and does not impede it's 
   functionality.
+
+- TestStreaming.cpp: Same as TestStreaming.py, but with hardcoded paths and less versatile.

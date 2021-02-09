@@ -14,7 +14,7 @@ bin-directory. E.g.
 
 ```
 cd bin
-./DataConverter ../Init/example.ini
+./AlphabetConverter ../Init/example.ini
 ```
 
 ## Data
