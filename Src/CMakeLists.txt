@@ -8,6 +8,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Transformers")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Windows")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Util")
 
-add_executable(DataConverter main.cpp)
+add_executable(AlphabetConverter main.cpp)
 
-target_link_libraries(DataConverter TransformerLib TransformerUtilityLib WindowLib GlobalUtilityLib)
+target_link_libraries(AlphabetConverter TransformerLib TransformerUtilityLib WindowLib GlobalUtilityLib)
