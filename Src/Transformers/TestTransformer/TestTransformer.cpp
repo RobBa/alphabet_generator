@@ -69,8 +69,8 @@ void TestTransformer::convert(){
 
     while(true){
       auto line = getConvertedLine();
-      if(line.empty()){
-        break; // TODO: you can do better than that
+      if(line.empty()){ // finished reading file
+        break;
       }
       outStringStream << line;
       linecount++;
@@ -81,24 +81,20 @@ void TestTransformer::convert(){
   }
 
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
+    int counter = 0;
 
     while(true){
-      if(inputStream.eof()){
-        try{
-          inputStream.setstate(std::ios_base::goodbit);
-          inputStream.clear();
-        }
-        catch(std::ifstream::failure e) {
-          std::cerr << "Exception opening/reading/closing file\n";
-        }
+      auto line = getConvertedLine();
+      if(line.empty()){
+        continue;
       }
-      else{
-        auto line = getConvertedLine();
-        if(line.empty()){
-          continue;
-        }
 
-        outputStream << line;
+      outputStream << line;
+        
+      counter++;
+      if(counter >= 10){
+        counter = 0;
+        outputStream.flush();
       }
     }
   }

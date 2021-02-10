@@ -20,6 +20,7 @@ class WindowBase{
 
 protected:
   const int stride; // The stride at which the windows will be shifted.
+  void resetStreamState(std::ifstream& inputStream) const;
 
 public:
   WindowBase(const int stride) : stride(stride){};
