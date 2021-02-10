@@ -48,7 +48,7 @@ std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream){
       }
 
       // covers the unfortunate case that last read line hit eof just before newline-character was written
-      if(line.empty() || line.at(0) == globalParameters.getInputFileDelimiter()){
+      if(line.empty() || line.at(0) == globalParameters.getInputFileNewlineCharacter()){
         continue;
       }
 

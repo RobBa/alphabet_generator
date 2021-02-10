@@ -55,8 +55,9 @@ private:
   int windowSize;
   int windowStride;
 
-  char inputFileDelimiter = '\n';
-
+  char inputFileDelimiter = ' ';
+  char inputFileNewlineCharacter = '\n';
+  
   StreamMode streamMode;
   InputFileFormat ifFormat;
   OutputFileFormat ofFormat;
@@ -88,6 +89,10 @@ public:
 
   inline const char getInputFileDelimiter() const{
     return inputFileDelimiter;
+  }
+
+  inline const char getInputFileNewlineCharacter() const{
+    return inputFileNewlineCharacter;
   }
 
   inline const auto& getSrcAddress() const{

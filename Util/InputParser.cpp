@@ -31,7 +31,7 @@ void HelperFunctions::parseInput(const std::string& path){
       continue;
     }
 
-    const auto lineSplit = splitString(line);
+    const auto lineSplit = splitString(line, ' ');
     if(lineSplit.size() < 3){
       continue;
     }

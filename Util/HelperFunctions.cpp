@@ -40,11 +40,11 @@ std::vector<std::string> HelperFunctions::splitString(const std::string& input, 
  * Removes all the tabs in a preliminary step if removeTabs set to true.
  * 
  * @param input The input string.
- * @param removeTabs Remove the tabs in preliminary step if set to true.
  * @param delimiter The delimiter.
+ * @param removeTabs Remove the tabs in preliminary step if set to true.
  * @return std::vector<std::string> Split (past tense) string returned as vector of substrings.
  */
-std::vector<std::string> HelperFunctions::splitString(std::string& input, bool removeTabs, const char delimiter){
+std::vector<std::string> HelperFunctions::splitString(std::string& input, const char delimiter, bool removeTabs){
   if(removeTabs){
     input.erase(std::remove(input.begin(), input.end(), '\t'), input.end());
   }

@@ -54,7 +54,7 @@ TransformerBase::TransformerBase(){
  * @return int The encoded netflow.
  */
 int TransformerBase::encodeStream(const std::string& stream) const{
-
+  const auto& globalParameters = GlobalParameters::getInstance();
   int res = 0;
 
   auto transformParametersCasted = dynamic_cast<DiscreteTransformParameters*>(transformParameters);
@@ -67,7 +67,7 @@ int TransformerBase::encodeStream(const std::string& stream) const{
 
   int spaceSize = transformParametersCasted->getAllCategoricalDataSize() * transformParametersCasted->getAllRangeValueSize();
 
-  auto lineSplit = HelperFunctions::splitString(stream);
+  auto lineSplit = HelperFunctions::splitString(stream, globalParameters.getInputFileDelimiter());
 
   for(const auto& feature: featureTypeMap){
     const int index = featureIndexMap.at(feature.first);

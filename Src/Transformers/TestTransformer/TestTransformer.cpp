@@ -129,7 +129,7 @@ std::string TestTransformer::getConvertedLine(){
       continue;
     }
 
-    const auto& lineSplit = HelperFunctions::splitString(line, true, ' ');
+    const auto& lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     
     if(lineSplit.at(featureIndexMap[sourceAddressHeader]) == globalParameters.getSrcAddress()){ // TODO: split twice now
       const int code = encodeStream(line);

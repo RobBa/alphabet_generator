@@ -16,8 +16,8 @@
 #include <string>
 
 namespace HelperFunctions{
-  std::vector<std::string> splitString(const std::string& input, const char delimiter = ' ');
-  std::vector<std::string> splitString(std::string& input, bool removeTabs, const char delimiter = ' ');
+  std::vector<std::string> splitString(const std::string& input, const char delimiter);
+  std::vector<std::string> splitString(std::string& input, const char delimiter, bool removeTabs);
 }
 
 #endif
