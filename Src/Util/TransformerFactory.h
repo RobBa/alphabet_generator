@@ -10,7 +10,7 @@
  */
 
 #include "TransformerBase.h"
-#include "TestTransformer.h"
+#include "BastaTransformer.h"
 
 #include "GlobalParameters.h"
 

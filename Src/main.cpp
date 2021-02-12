@@ -39,8 +39,8 @@ int main(int argc, char **argv){
 
   // TODO: implement this is in a nicer factory design pattern
   switch(GlobalParameters::getInstance().getTransformerType()){
-    case TransformerType::TestTransformer:
-      auto transformer = new TestTransformer;
+    case TransformerType::BastaTransformer:
+      auto transformer = new BastaTransformer;
         transformer->convert();
         free(transformer);
         break;

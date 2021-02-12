@@ -31,7 +31,7 @@ enum class OutputFileFormat{
 };
 
 enum class TransformerType{
-  TestTransformer
+  BastaTransformer
 };
 
 enum class WindowType{
@@ -47,11 +47,10 @@ class GlobalParameters{
 private:
   GlobalParameters(){};
 
-  std::string srcAddress;
   std::string inputFile;
   std::string outputFile;
+  std::string featureIni;
 
-  int alphabetSize;
   int windowSize;
   int windowStride;
 
@@ -75,10 +74,6 @@ public:
 
   /**************************** getter *******************************/
 
-  inline const auto getAlphabetSize() const{
-    return alphabetSize;
-  }
-
   inline const auto getWindowSize() const{
     return windowSize;
   }
@@ -95,16 +90,16 @@ public:
     return inputFileNewlineCharacter;
   }
 
-  inline const auto& getSrcAddress() const{
-    return srcAddress;
-  }
-
   inline const auto& getInputFile() const{
     return inputFile;
   }
 
   inline const auto& getOutputFile() const{
     return outputFile;
+  }
+
+  inline const auto& getFeatureIni() const{
+    return featureIni;
   }
 
   inline const auto getStreamMode() const{
@@ -129,10 +124,6 @@ public:
 
   /**************************** setter ****************************/
 
-  inline void setAlphabetSize(const int alphabetSize){
-    this->alphabetSize = alphabetSize;
-  }
-
   inline void setWindowSize(const int windowSize){
     this->windowSize = windowSize;
   }
@@ -141,16 +132,16 @@ public:
     this->windowStride = windowStride;
   }
 
-  inline void setSrcAddress(const std::string& srcAddress){
-    this->srcAddress = srcAddress;
-  }
-
   inline void setInputFile(const std::string& inputFile){
     this->inputFile = inputFile;
   }
 
   inline void setOutputFile(const std::string& outputFile){
     this->outputFile = outputFile;
+  }
+
+  inline void setFeatureIni(const std::string& featureIni){
+    this->featureIni = featureIni;
   }
 
   inline void setStreamMode(const int i){
@@ -185,7 +176,7 @@ public:
 
   inline void setTransformerType(const int i){
     if(i == 0){
-      this->transformerType = TransformerType::TestTransformer;
+      this->transformerType = TransformerType::BastaTransformer;
     }
     else{
       throw new std::invalid_argument("Transformer type argument not implemented.");

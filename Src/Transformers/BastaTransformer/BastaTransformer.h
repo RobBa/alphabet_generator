@@ -1,5 +1,5 @@
 /**
- * @file DiscreteTransformer.h
+ * @file BastaTransformer.h
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
  * @brief This transformer transforms a stream of data of specific format (e.g. netflows) 
  * into discrete integer-value sequences in abbadingo format. 
@@ -19,24 +19,26 @@
 #include "TransformerBase.h"
 #include "FixedSizeWindow.h"
 
-class TestTransformer : public TransformerBase{
-protected:
+class BastaTransformer : public TransformerBase{
+private:
   /**
    * @brief Convenience field.
    * 
    */
   int alphabetSize = 0;
-  
-  std::string sourceAddressHeader;
 
-  virtual std::string getConvertedLine() override;
-  virtual void preprocess() override;
+  /**
+   * @brief Convenience, to save us paths in the main-ini file.
+   * 
+   */
+  const std::string featureIniDir = "../Src/Transformers/BastaTransformer/FeatureParameters/";
+
+  const std::string getConvertedLine();
+  int encodeStream(const std::string& stream) const;
+
+  //void initFeatureIndexMapFromHeader(const std::string& sourceAddressHeader, const char delimiter = ' ');
 public:   
-  TestTransformer() : TransformerBase(){
-    this->sourceAddressHeader = "SrcAddr";
-    preprocess();
-  };
-
+  BastaTransformer();
   virtual void convert() override;
 };
 

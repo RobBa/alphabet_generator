@@ -21,7 +21,7 @@
  * @param path 
  */
 void HelperFunctions::parseInput(const std::string& path){
-  std::ifstream file(path);
+  auto file = std::ifstream(path);
   std::string line;
   
   auto& globalParameters = GlobalParameters::getInstance();
@@ -31,7 +31,7 @@ void HelperFunctions::parseInput(const std::string& path){
       continue;
     }
 
-    const auto lineSplit = splitString(line, ' ');
+    const auto lineSplit = HelperFunctions::splitString(line, ' ');
     if(lineSplit.size() < 3){
       continue;
     }
@@ -39,10 +39,7 @@ void HelperFunctions::parseInput(const std::string& path){
     const auto& indicator = lineSplit[0];
     const auto& value = lineSplit[2];
     
-    if(indicator == "alphabetSize"){
-      globalParameters.setAlphabetSize(std::stoi(value));
-    }
-    else if(indicator == "windowSize"){
+    if(indicator == "windowSize"){
       globalParameters.setWindowSize(std::stoi(value));
     }
     else if(indicator == "windowStride"){
@@ -51,16 +48,14 @@ void HelperFunctions::parseInput(const std::string& path){
     else if(indicator == "streamMode"){
       globalParameters.setStreamMode(std::stoi(value));
     }
-    else if(indicator == "srcAddress"){
-      globalParameters.setSrcAddress(value);
-    }
     else if(indicator == "inputFile"){
-      //std::string filepath = std::filesystem::current_path();
-
       globalParameters.setInputFile(value);
     }
     else if(indicator == "outputFile"){
       globalParameters.setOutputFile(value);
+    }
+    else if(indicator == "featureIni"){
+      globalParameters.setFeatureIni(value);
     }
     else if(indicator == "inputFileFormat"){
       globalParameters.setInputfileFormat(std::stoi(value));
