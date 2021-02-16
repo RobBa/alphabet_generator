@@ -56,11 +56,11 @@ void BastaTransformer::convert(){
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
 
     while(true){
-      const auto symbols = getSymbols();
-      if(symbols.empty()){ // finished reading file
+      if(inputStream.eof()){
         break;
       }
 
+      const auto symbols = getSymbols();
       if(outputFormat == OutputFileFormat::Abbadingo){
         outStringStream << toAbbadingoFormat(symbols);
       }
