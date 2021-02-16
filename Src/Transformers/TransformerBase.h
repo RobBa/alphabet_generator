@@ -29,14 +29,35 @@ protected:
   WindowBase* window;
   FeatureBase* transformParameters;
 
+  /**
+   * @brief Fetches the symbols out of the window frame.
+   * 
+   * We chose this abstract representation to have an easy conversion from 
+   * symbols to any desired output format.
+   * 
+   * @return std::vector<int> Vector with the symbols.
+   */
+  virtual const std::vector<int> getSymbols() = 0;
+
+  const std::string toAbbadingoFormat(const std::vector<int>& symbols) const;
+  const std::string toAugmentedAbbadingoFormat(const std::vector<int>& symbols) const;
+
 public: 
   TransformerBase();
 
-  ~TransformerBase(){
+  virtual ~TransformerBase(){
+
     free(window);
     free(transformParameters);
+
+    inputStream.close();
+    outputStream.close();
   }
   
+  /**
+   * @brief Main loop that converts the file.
+   * 
+   */
   virtual void convert() = 0;
 };
 

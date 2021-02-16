@@ -14,6 +14,8 @@
 #include "FixedSizeWindow.h"
 #include "HelperFunctions.h"
 
+#include <sstream>
+
 /**
  * @brief Construct a new Transformer Base:: Transformer Base object
  * 
@@ -40,4 +42,22 @@ TransformerBase::TransformerBase(){
 
   inputStream.open(globalParameters.getInputFile(), std::ios_base::in);
   outputStream.open(globalParameters.getOutputFile(), std::ios_base::out);
+}
+
+/**
+ * @brief Convert a line to abbadingo format and returns that line.
+ * 
+ * @param symbols The input symbols to convert.
+ * @return const std::string The converted line as a string.
+ */
+const std::string TransformerBase::toAbbadingoFormat(const std::vector<int>& symbols) const {
+  std::stringstream res;
+  res << symbols.size();
+
+  for(const auto symbol: symbols){
+    res << " " << symbol;
+  }
+  res << "\n";
+
+  return res.str();  
 }

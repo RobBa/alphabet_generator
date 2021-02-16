@@ -11,21 +11,21 @@ This folder contains scripts for some testing.
   The script currently does not check every possible input scenario. Example run from this 
   directory: 
 
-  '''
+  ```
   python TestStreaming.py ../Data/exampleStreaming.txt ./output.txt
-  '''
+  ```
 
   or 
 
-  '''
+  ```
   python TestStreaming.py ../Data/exampleStreaming.txt ./output.txt --converter_ini ../Init/example.ini 
-  '''
+  ```
 
   . For help, run 
 
-  '''
+  ```
   python TestStreaming.py --help
-  '''
+  ```
 
   Hint: When observing the file you'll see that lines will not appear line by line, but rather in
   batches of a few lines. This is due to the buffering of the software and does not impede it's 

@@ -49,35 +49,50 @@ BastaTransformer::BastaTransformer() : TransformerBase() {
 void BastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
+  const auto& outputFormat = globalParameters.getOutputfileFormat();
   std::stringstream outStringStream;
   int linecount = 0;
 
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
 
     while(true){
-      const auto line = getConvertedLine();
-      if(line.empty()){ // finished reading file
+      const auto symbols = getSymbols();
+      if(symbols.empty()){ // finished reading file
         break;
       }
-      outStringStream << line;
+
+      if(outputFormat == OutputFileFormat::Abbadingo){
+        outStringStream << toAbbadingoFormat(symbols);
+      }
+      else{
+        throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
+      }
       linecount++;
     }
 
     outputStream << linecount << " " << alphabetSize << "\n";
     outputStream << outStringStream.str();
+
+    outputStream.close();
+    inputStream.close();
   }
 
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
     int counter = 0;
 
     while(true){
-      const auto line = getConvertedLine();
-      if(line.empty()){
+      const auto symbols = getSymbols();
+      if(symbols.empty()){
         continue;
       }
 
-      outputStream << line;
-        
+      if(outputFormat == OutputFileFormat::Abbadingo){
+        outStringStream << toAbbadingoFormat(symbols);
+      }
+      else{
+        throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
+      }
+
       counter++;
       if(counter >= 10){
         counter = 0;
@@ -146,22 +161,19 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
  * @param inputStream The input stream.
  * @return const std::string The string.
  */
-const std::string BastaTransformer::getConvertedLine(){
+const std::vector<int> BastaTransformer::getSymbols(){
   const auto& globalParameters = GlobalParameters::getInstance();
 
   auto featureIndexMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureindexMap();
   const auto& sourceAddressField = dynamic_cast<BastaFeatures*>(transformParameters)->getSourceAddressField();
   const auto& sourceAddress = dynamic_cast<BastaFeatures*>(transformParameters)->getSourceAddress();
 
-  std::stringstream sstream; 
-  int symbolCount = 0;
+  std::vector<int> res;
 
   std::vector<std::string> lines = window->getWindow(inputStream);
   if(lines.empty()){
-    return sstream.str();
+    return res;
   }
-
-  std::stringstream symbols;
 
   // convert the lines into a line in abbadingo
   for(auto& line: lines){
@@ -174,41 +186,9 @@ const std::string BastaTransformer::getConvertedLine(){
     if(lineSplit.at(featureIndexMap[sourceAddressField]) == sourceAddress){ // TODO: split twice now
       const int code = encodeStream(line);
       alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
-      symbols << code << " ";
-      symbolCount++;
+      res.push_back(code);
     }
   }
 
-  sstream << symbolCount << " " << symbols.str() << "\n";
-
-  return sstream.str();
+  return res;
 };
-
-/**
- * @brief Helper method for the preprocessing step. Gets the features 
- * from the header of the input stream and maps them onto the position
- * of each input line and writes them into the featureMap. Prerequisites:
- * The featureTypeMap should have been filled by now.
- * 
- * Function can be overwritten by child classes if needed.
- * String manipulation taken from https://stackoverflow.com/a/5888676
- * 
- * @param delimiter The delimiter character.
- */
-//void TransformerBase::initFeatureIndexMapFromHeader(const std::string& sourceAddressHeader, const char delimiter){
-//  if(featureTypeMap.size() == 0){
-//    throw new std::logic_error("getFeaturesFromHeader-method must only be called after featureTypeMap has been defined properly.");
-//  }
-//
-//  std::string header;
-//  std::getline(inputStream, header);
-//  const auto fields = HelperFunctions::splitString(header, delimiter);
-//  
-//  int index = 0;
-//  for(const auto& field: fields){
-//    if(featureTypeMap.count(field) > 0 || sourceAddressHeader == field){
-//      featureIndexMap[field] = index;
-//    }
-//    index++;
-//  }
-//}

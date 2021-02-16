@@ -33,10 +33,9 @@ private:
    */
   const std::string featureIniDir = "../Src/Transformers/BastaTransformer/FeatureParameters/";
 
-  const std::string getConvertedLine();
+  const std::vector<int> getSymbols() override;
   int encodeStream(const std::string& stream) const;
 
-  //void initFeatureIndexMapFromHeader(const std::string& sourceAddressHeader, const char delimiter = ' ');
 public:   
   BastaTransformer();
   virtual void convert() override;
