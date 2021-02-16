@@ -29,6 +29,30 @@ private:
   std::unique_ptr< std::pair<std::string, int> > sourceAddressPair = nullptr;
 
   /**
+   * @brief Convenience field, if we want to filter input parse by specific 
+   * source address only.
+   * 
+   * Is set if .ini file has a "SourceAddress" parameter specified, see 
+   * FeatureParameters/example.ini
+   * 
+   */
+  bool filterSourceAddress = false;
+
+  /**
+   * @brief Convenience field. Index pointing to the destination field after
+   * linesplit.
+   * 
+   */
+  int dstAddressIndex;
+
+  /**
+   * @brief Convenience field. Index pointing to the label field after
+   * linesplit.
+   * 
+   */
+  int labelIndex;
+
+  /**
    * @brief Convenience field that helps us for several output formats.
    * 
    */
@@ -63,6 +87,22 @@ public:
 
   inline const auto& getSourceAddressPair() const {
     return this->sourceAddressPair;
+  }
+
+  inline const auto& getAllFeatureNames() const {
+    return this->allFeatures;
+  }
+
+  inline const auto getDstIndex() const {
+    return this->dstAddressIndex;
+  }
+
+  inline const auto getLabelIndex() const {
+    return this->labelIndex;
+  }
+
+  inline const auto filterBySourceAddress() const {
+    return this->filterSourceAddress;
   }
 
   const int getCategoricalValue(const std::string& category, const std::string& name);

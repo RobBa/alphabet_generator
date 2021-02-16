@@ -33,7 +33,7 @@ private:
    */
   const std::string featureIniDir = "../Src/Transformers/BastaTransformer/FeatureParameters/";
 
-  const std::vector<int> getSymbols() override;
+  void writeEntry(std::stringstream& stream) override;
   int encodeStream(const std::string& stream) const;
 
 public:   

@@ -73,7 +73,20 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else if(feature == "SourceAddress"){
-      this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair(category, stoi(value)));
+      this->filterSourceAddress = true;
+      this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair(value, 0));
+    }
+
+    else if(feature == "SrcAddress"){
+      this->sourceAddressPair->second = stoi(value);
+    }
+
+    else if(feature == "DstAddress"){
+      this->dstAddressIndex = stoi(value);
+    }
+
+    else if(feature == "LabelIndex"){
+      this->labelIndex = stoi(value);
     }
 
     else if(feature == "HasHeader"){
@@ -84,13 +97,13 @@ void BastaFeatures::initFromFile(const std::string& filePath){
         this->setHasHeader(false);
       }
       else{
-        throw new std::invalid_argument("Argument " + value + "for HasHeader in the feature's .ini is invalid. Please give only 'true' or 'false'");
+        throw new std::invalid_argument("Argument " + value + "for HasHeader in the feature's .ini is invalid. Please give either 'true' or 'false'");
       }
       continue;
     }
 
     else{
-        throw new std::invalid_argument("Argument " + value + "for HasHeader is invalid. Please give only 'true' or 'false'");
+        throw new std::invalid_argument("Argument " + value + "for HasHeader is invalid. Please give either 'true' or 'false'");
     }
 
     this->featureIndexMap[feature] = stoi(value);

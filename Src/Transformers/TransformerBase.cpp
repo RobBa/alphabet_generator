@@ -74,21 +74,20 @@ const std::string TransformerBase::toAugmentedAbbadingoFormat(const std::string&
                                                               const std::vector<std::string>& allFeatures,
                                                               const int symbol, 
                                                               const std::string& flowType) const {
-  //std::stringstream res;
-  //res << ip1 << " <-> " << ip2 << "\n";
-  //
-  //static bool hasInitialized = false;
-  //static std::stringstream featureString;
-  //if(!hasInitialized && !allFeatures.empty()){
-  //  featureString << allFeatures.front();
-  //  for(int i = 0; i < allFeatures.size(); ++i){
-  //    featureString << ", " << allFeatures[i];
-  //  }
-  //  featureString << "/";
-  //  hasInitialized = true;
-  //}
-  //
-  //// TODO
-  //res << 
+  std::stringstream res;
+  res << ip1 << " <-> " << ip2 << "\n";
+  
+  static bool hasInitialized = false;
+  static std::stringstream featureString;
+  if(!hasInitialized && !allFeatures.empty()){
+    featureString << allFeatures.front();
+    for(int i = 0; i < allFeatures.size(); ++i){
+      featureString << "," << allFeatures[i];
+    }
+    hasInitialized = true;
+  }
+  
+  res << symbol << ":" << featureString.str() << "/" << flowType;
+  return res.str();
 }
 

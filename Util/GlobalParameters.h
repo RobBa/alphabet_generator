@@ -27,7 +27,8 @@ enum class InputFileFormat{
 };
 
 enum class OutputFileFormat{
-  Abbadingo
+  Abbadingo,
+  AugmentedAbbadingo
 };
 
 enum class TransformerType{
@@ -168,6 +169,9 @@ public:
   inline void setOutputfileFormat(const int i){
     if(i == 0){
       this->ofFormat = OutputFileFormat::Abbadingo;
+    }
+    else if(i == 1){
+      this->ofFormat = OutputFileFormat::AugmentedAbbadingo;
     }
     else{
       throw new std::invalid_argument("Output file format argument not implemented.");

@@ -50,6 +50,7 @@ void BastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto& outputFormat = globalParameters.getOutputfileFormat();
+
   std::stringstream outStringStream;
   int linecount = 0;
 
@@ -60,17 +61,14 @@ void BastaTransformer::convert(){
         break;
       }
 
-      const auto symbols = getSymbols();
-      if(outputFormat == OutputFileFormat::Abbadingo){
-        outStringStream << toAbbadingoFormat(symbols);
-      }
-      else{
-        throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
-      }
+      writeEntry(outStringStream);
       linecount++;
     }
 
-    outputStream << linecount << " " << alphabetSize << "\n";
+    if(outputFormat == OutputFileFormat::Abbadingo){
+      outputStream << linecount << " " << alphabetSize << "\n";
+    }
+
     outputStream << outStringStream.str();
 
     outputStream.close();
@@ -81,17 +79,7 @@ void BastaTransformer::convert(){
     int counter = 0;
 
     while(true){
-      const auto symbols = getSymbols();
-      if(symbols.empty()){
-        continue;
-      }
-
-      if(outputFormat == OutputFileFormat::Abbadingo){
-        outStringStream << toAbbadingoFormat(symbols);
-      }
-      else{
-        throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
-      }
+      writeEntry(outStringStream);
 
       counter++;
       if(counter >= 10){
@@ -154,43 +142,64 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
 }
 
 /**
- * @brief Gets a line in the new format. Side effect: 
+ * @brief Write an entry to the stream. Side effect: 
  * Keeps track of the alphabet size, i.e. updates the alphabet size if
  * we find a new element.
  * 
  * @param inputStream The input stream.
  * @return const std::string The string.
  */
-const std::vector<int> BastaTransformer::getSymbols(){
+void BastaTransformer::writeEntry(std::stringstream& stream){
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
+  const auto& outputFormat = globalParameters.getOutputfileFormat();
 
   const auto& featureIndexMap = featureInformation->getFeatureindexMap();
   const auto& sourceAddress = featureInformation->getSourceAddressPair();
-  static bool filterBySourceAddress = sourceAddress != nullptr;
+  static bool filterBySourceAddress = featureInformation->filterBySourceAddress();
 
-  std::vector<int> res;
+  if(outputFormat == OutputFileFormat::Abbadingo){
+    std::vector<int> symbols;
 
-  std::vector<std::string> lines = window->getWindow(inputStream);
-  if(lines.empty()){
-    return res;
-  }
-
-  // convert the lines into a line in abbadingo
-  for(auto& line: lines){
-    if(line.empty()){
-      continue;
+    std::vector<std::string> lines = window->getWindow(inputStream);
+    if(lines.empty()){
+      return;
     }
 
-    const auto& lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
+    // convert the lines into a line in abbadingo
+    for(auto& line: lines){
+      if(line.empty()){
+        continue;
+      }
+
+      const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
+      if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
+        continue;
+      }
+
+      const int code = encodeStream(line);
+      alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
+      symbols.push_back(code);
+    }
+
+      stream << toAbbadingoFormat(symbols);
+  }
+
+  else if(outputFormat == OutputFileFormat::AugmentedAbbadingo){
+    std::string line;
+    getline(inputStream, line);
+
+    const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
-      continue;
+      return;
     }
 
     const int code = encodeStream(line);
-    alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
-    res.push_back(code);
+    stream << toAugmentedAbbadingoFormat(sourceAddress->first, lineSplit[featureInformation->getDstIndex()], featureInformation->getAllFeatureNames(),
+                                         code, lineSplit[featureInformation->getLabelIndex()]);
   }
 
-  return res;
+  else{
+    throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
+  }
 };

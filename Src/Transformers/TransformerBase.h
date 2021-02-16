@@ -30,17 +30,17 @@ protected:
   FeatureBase* transformParameters;
 
   /**
-   * @brief Fetches the symbols out of the window frame.
+   * @brief Writes and entry into the stream
    * 
    * We chose this abstract representation to have an easy conversion from 
    * symbols to any desired output format.
    * 
-   * @return std::vector<int> Vector with the symbols.
+ * @param stream The stream to write to.
    */
-  virtual const std::vector<int> getSymbols() = 0;
+  virtual void writeEntry(std::stringstream& stream) = 0;
 
   const std::string toAbbadingoFormat(const std::vector<int>& symbols) const;
-  
+
   const std::string toAugmentedAbbadingoFormat(const std::string& ip1, 
                                                const std::string& ip2, 
                                                const std::vector<std::string>& allFeatures,
