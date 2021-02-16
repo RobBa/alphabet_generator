@@ -16,8 +16,11 @@
 #include <string>
 
 namespace HelperFunctions{
+  void removeChars( /*out*/ std::string& input, const char rmChar);
+  void replaceCharacters( /*out*/ std::string& input, const char targetChar, const char replacement);
+
   std::vector<std::string> splitString(const std::string& input, const char delimiter);
-  std::vector<std::string> splitString(std::string& input, const char delimiter, bool removeTabs);
+  std::vector<std::string> splitString(std::string& input, const char delimiter, bool replaceTabs);
 }
 
 #endif

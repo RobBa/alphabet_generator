@@ -163,10 +163,11 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
  */
 const std::vector<int> BastaTransformer::getSymbols(){
   const auto& globalParameters = GlobalParameters::getInstance();
+  const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
 
-  auto featureIndexMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureindexMap();
-  const auto& sourceAddressField = dynamic_cast<BastaFeatures*>(transformParameters)->getSourceAddressField();
-  const auto& sourceAddress = dynamic_cast<BastaFeatures*>(transformParameters)->getSourceAddress();
+  const auto& featureIndexMap = featureInformation->getFeatureindexMap();
+  const auto& sourceAddress = featureInformation->getSourceAddressPair();
+  static bool filterBySourceAddress = sourceAddress != nullptr;
 
   std::vector<int> res;
 
@@ -182,12 +183,13 @@ const std::vector<int> BastaTransformer::getSymbols(){
     }
 
     const auto& lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
-    
-    if(lineSplit.at(featureIndexMap[sourceAddressField]) == sourceAddress){ // TODO: split twice now
-      const int code = encodeStream(line);
-      alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
-      res.push_back(code);
+    if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
+      continue;
     }
+
+    const int code = encodeStream(line);
+    alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
+    res.push_back(code);
   }
 
   return res;

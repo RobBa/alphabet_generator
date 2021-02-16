@@ -14,22 +14,25 @@
 
 #include "FeatureBase.h"
 
+#include <memory>
+
 
 class BastaFeatures : public FeatureBase{
 private:
 
   /**
-   * @brief Convenience field, to filter out desired 
-   * netflows in network data.
+   * @brief In case we want to parse a file for a source address. 
+   * Has the address and the index in the split entry of the input 
+   * file.
    * 
    */
-  const std::string sourceAddressField = "Src";
+  std::unique_ptr< std::pair<std::string, int> > sourceAddressPair = nullptr;
 
   /**
-   * @brief In case we want to parse a netflow file for a source address.
+   * @brief Convenience field that helps us for several output formats.
    * 
    */
-  std::string sourceAddress;
+  std::vector<std::string> allFeatures;
 
   /**
    * @brief We map categorical data to ranges.
@@ -58,12 +61,8 @@ public:
 
   void initFromFile(const std::string& filePath) override;
 
-  inline const auto& getSourceAddressField() const {
-    return this->sourceAddressField;
-  } 
-
-  inline const auto& getSourceAddress() const {
-    return this->sourceAddress;
+  inline const auto& getSourceAddressPair() const {
+    return this->sourceAddressPair;
   }
 
   const int getCategoricalValue(const std::string& category, const std::string& name);

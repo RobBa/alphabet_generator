@@ -40,7 +40,12 @@ protected:
   virtual const std::vector<int> getSymbols() = 0;
 
   const std::string toAbbadingoFormat(const std::vector<int>& symbols) const;
-  const std::string toAugmentedAbbadingoFormat(const std::vector<int>& symbols) const;
+  
+  const std::string toAugmentedAbbadingoFormat(const std::string& ip1, 
+                                               const std::string& ip2, 
+                                               const std::vector<std::string>& allFeatures,
+                                               const int symbol, 
+                                               const std::string& flowType) const;
 
 public: 
   TransformerBase();

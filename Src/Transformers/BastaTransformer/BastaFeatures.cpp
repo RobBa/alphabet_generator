@@ -51,7 +51,9 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     const auto& value = lineSplit.back();
 
     if(category == "categorical"){
+      this->allFeatures.push_back(feature);
       this->addCategoricalFeature(feature);
+
       std::vector<std::string> categories;
       for(int i = 2; i < lineSplit.size() - 2; ++i){
         categories.push_back(lineSplit[i]);
@@ -60,7 +62,9 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else if(category == "rangeBased"){
+      this->allFeatures.push_back(feature);
       this->addRangeBasedFeature(feature);
+
       std::vector<double> ranges;
       for(int i = 2; i < lineSplit.size() - 2; ++i){
         ranges.push_back(stod(lineSplit[i]));
@@ -69,8 +73,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else if(feature == "SourceAddress"){
-      this->sourceAddress = category;
-      this->featureIndexMap[sourceAddressField] = stoi(value); 
+      this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair(category, stoi(value)));
     }
 
     else if(feature == "HasHeader"){

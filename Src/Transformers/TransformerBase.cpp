@@ -61,3 +61,34 @@ const std::string TransformerBase::toAbbadingoFormat(const std::vector<int>& sym
 
   return res.str();  
 }
+
+/**
+/**
+ * @brief Convert a line to the augmented abbadingo format and returns that line.
+ * 
+ * @param symbols The input symbols to convert.
+ * @return const std::string The converted line as a string.
+ */
+const std::string TransformerBase::toAugmentedAbbadingoFormat(const std::string& ip1, 
+                                                              const std::string& ip2, 
+                                                              const std::vector<std::string>& allFeatures,
+                                                              const int symbol, 
+                                                              const std::string& flowType) const {
+  //std::stringstream res;
+  //res << ip1 << " <-> " << ip2 << "\n";
+  //
+  //static bool hasInitialized = false;
+  //static std::stringstream featureString;
+  //if(!hasInitialized && !allFeatures.empty()){
+  //  featureString << allFeatures.front();
+  //  for(int i = 0; i < allFeatures.size(); ++i){
+  //    featureString << ", " << allFeatures[i];
+  //  }
+  //  featureString << "/";
+  //  hasInitialized = true;
+  //}
+  //
+  //// TODO
+  //res << 
+}
+
