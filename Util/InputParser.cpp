@@ -14,6 +14,7 @@
 #include "HelperFunctions.h"
 
 #include <fstream>
+#include <algorithm>
 
 /**
  * @brief Parses the input file and writes them into the global parameters.
@@ -56,6 +57,14 @@ void HelperFunctions::parseInput(const std::string& path){
     }
     else if(indicator == "featureIni"){
       globalParameters.setFeatureIni(value);
+    }
+    else if(indicator == "delimiter"){
+      auto delimiter = value;
+      HelperFunctions::removeChars(delimiter, '\'');
+      if(delimiter.size() != 1){
+        throw new std::invalid_argument("Character " + delimiter + " invalid for delimiter in .ini");
+      }
+      globalParameters.setDelimiter(delimiter.front());
     }
     else if(indicator == "inputFileFormat"){
       globalParameters.setInputfileFormat(std::stoi(value));

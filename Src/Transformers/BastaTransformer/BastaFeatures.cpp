@@ -9,6 +9,7 @@
  * 
  */
 
+
 #include "BastaFeatures.h"
 #include "HelperFunctions.h"
 
@@ -19,6 +20,7 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+
 
 /**
  * @brief Parses the .ini file of the features.
@@ -74,14 +76,23 @@ void BastaFeatures::initFromFile(const std::string& filePath){
 
     else if(feature == "SourceAddress"){
       this->filterSourceAddress = true;
-      this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair(value, 0));
+      if(this->sourceAddressPair == nullptr){
+        this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair(value, -1));
+        continue;
+      }
+      this->sourceAddressPair->first = value;
     }
 
-    else if(feature == "SrcAddress"){
-      this->sourceAddressPair->second = stoi(value);
+    else if(feature == "SrcIndex"){
+      const auto index = stoi(value);
+      if(this->sourceAddressPair == nullptr){
+        this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair("", index));
+        continue;
+      }
+      this->sourceAddressPair->second = index;
     }
 
-    else if(feature == "DstAddress"){
+    else if(feature == "DstIndex"){
       this->dstAddressIndex = stoi(value);
     }
 
@@ -103,7 +114,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else{
-        throw new std::invalid_argument("Argument " + value + "for HasHeader is invalid. Please give either 'true' or 'false'");
+        throw new std::invalid_argument("Feature " + feature + "not registered in BastaFeatures-Parser.");
     }
 
     this->featureIndexMap[feature] = stoi(value);
@@ -125,6 +136,7 @@ const int BastaFeatures::getCategoricalValue(const std::string& category, const 
   
   return categoricalData[category][name];
 }
+
 
 /**
  * @brief Get the numerical cluster value within the ranges.
@@ -151,6 +163,7 @@ const int BastaFeatures::getRangeValue(const std::string& category, const double
   return res;
 }
 
+
 /**
  * @brief Gets the multiplied size of the categorical data. Because we expect this quantity 
  * to not grow after initialization, it will be computed only once, and then returned.
@@ -173,6 +186,7 @@ const int BastaFeatures::getAllCategoricalDataSize() const{
 
   return res;
 }
+
 
 /**
  * @brief Gets the multiplied size of the categorical data. Because we expect this quantity to not 
@@ -197,6 +211,7 @@ const int BastaFeatures::getAllRangeValueSize() const{
   return res;
 }
 
+
 /**
  * @brief Gets the size of the categorical data bin specified by category. 
  * 
@@ -209,6 +224,7 @@ const int BastaFeatures::getAllRangeValueSize() const{
 const int BastaFeatures::getCategoricalDataSize(const std::string category) const{
   return categoricalData.at(category).size();
 }
+
 
 /**
  * @brief Gets the size of the range data bin specified by category. 
@@ -223,6 +239,7 @@ const int BastaFeatures::getRangeDataSize(const std::string category) const{
   return clusteringRanges.at(category).size();
 }
 
+
 /**
  * @brief Add an entry to categorical data. This function helps to determine categorical data mapping
  * at runtime.
@@ -232,14 +249,32 @@ const int BastaFeatures::getRangeDataSize(const std::string category) const{
  * "protocol" would be pointing towards a map mapping the names onto integers, which can then 
  * be retrieved via getNumericalCategory().
  * 
+ * @param category Name of the category.
  * @param name Name of the entry of the category.
  */
 void BastaFeatures::addCategoricalEntry(const std::string& category, const std::string& name){
-  auto& categoryMap = categoricalData[category];
+  auto& categoryMap = categoricalData.at(category);
   if(categoryMap.count(name) == 0){
     categoryMap[name] = categoryMap.size() + 1;
   }
 }
+
+
+/**
+ * @brief Checks if entry already exists.
+ * 
+ * @param category Name of the category.
+ * @param name Name of the entry to be checked.
+ */
+bool BastaFeatures::hasCategoricalEntry(const std::string& category, const std::string& name) const {
+  const auto& categoryMap = categoricalData.at(category);
+  if(categoryMap.count(name) == 0){
+    return false;
+  }
+
+  return true;
+}
+
 
 /**
  * @brief Add entire entry list to categorical data. If category already exists, then it will be overwritten.
@@ -268,7 +303,7 @@ void BastaFeatures::addCategoricalEntry(const std::string& category, const std::
     std::cerr << e.what() << std::endl;
   }
 
-  assert(categoricalData[category].size() == names.size());
+  assert(categoricalData.at(category).size() == names.size());
 }
 
 /**
@@ -295,5 +330,5 @@ void BastaFeatures::setRanges(const std::string& category, std::vector<double>& 
     std::cerr << e.what() << std::endl;
   }
 
-  assert(clusteringRanges[category].size() == ranges.size());
+  assert(clusteringRanges.at(category).size() == ranges.size());
 }

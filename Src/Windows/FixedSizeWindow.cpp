@@ -19,7 +19,7 @@
 
 #include <utility>
 
-std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream){
+std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) const {
   std::vector<std::string> res;
   const static auto& globalParameters = GlobalParameters::getInstance();
 

@@ -55,7 +55,7 @@ private:
   int windowSize;
   int windowStride;
 
-  char inputFileDelimiter = ' ';
+  char inFileDelimiter = ' ';
   char inputFileNewlineCharacter = '\n';
   
   StreamMode streamMode;
@@ -84,7 +84,7 @@ public:
   }
 
   inline const char getInputFileDelimiter() const{
-    return inputFileDelimiter;
+    return inFileDelimiter;
   }
 
   inline const char getInputFileNewlineCharacter() const{
@@ -143,6 +143,10 @@ public:
 
   inline void setFeatureIni(const std::string& featureIni){
     this->featureIni = featureIni;
+  }
+
+  inline void setDelimiter(const char delimiter){
+    this->inFileDelimiter = delimiter;
   }
 
   inline void setStreamMode(const int i){

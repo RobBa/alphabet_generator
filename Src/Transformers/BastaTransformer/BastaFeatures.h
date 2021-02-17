@@ -115,6 +115,7 @@ public:
   const int getRangeDataSize(const std::string category) const;
 
   void addCategoricalEntry(const std::string& category, const std::string& name);
+  bool hasCategoricalEntry(const std::string& category, const std::string& name) const;
 };
 
 #endif

@@ -27,7 +27,7 @@ public:
   FixedSizeWindow(const int size, const int stride)
    : WindowBase(stride), size(size){};
 
-  virtual std::vector<std::string> getWindow(std::ifstream& inputStream) override;
+  virtual std::vector<std::string> getWindow(std::ifstream& inputStream) const override;
 };
 
 #endif

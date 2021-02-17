@@ -24,7 +24,7 @@ protected:
 
 public:
   WindowBase(const int stride) : stride(stride){};
-  virtual std::vector<std::string> getWindow(std::ifstream& ifstream) = 0;
+  virtual std::vector<std::string> getWindow(std::ifstream& ifstream) const = 0;
 };
 
 #endif

@@ -90,4 +90,3 @@ const std::string TransformerBase::toAugmentedAbbadingoFormat(const std::string&
   res << symbol << ":" << featureString.str() << "/" << flowType;
   return res.str();
 }
-

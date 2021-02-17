@@ -118,7 +118,7 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
   else if(stream.size() == 0){
     throw new std::invalid_argument("Error: Tried to encode empty stream.");
   } 
-
+  
   int spaceSize = transformParametersCasted->getAllCategoricalDataSize() * transformParametersCasted->getAllRangeValueSize();
 
   auto lineSplit = HelperFunctions::splitString(stream, globalParameters.getInputFileDelimiter());
@@ -128,6 +128,10 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
     const auto& rawValue = lineSplit.at(index);
 
     if(feature.second == FeatureBase::FeatureType::categorical){
+      if(!transformParametersCasted->hasCategoricalEntry(feature.first, rawValue)){
+        transformParametersCasted->addCategoricalEntry(feature.first, rawValue);
+      }
+
       res += transformParametersCasted->getCategoricalValue(feature.first, rawValue) * spaceSize / transformParametersCasted->getCategoricalDataSize(feature.first);
       spaceSize /= transformParametersCasted->getCategoricalDataSize(feature.first);
     }

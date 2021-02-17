@@ -18,7 +18,7 @@
  * 
  * @param inputStream The input stream.
  */
-void WindowBase::resetStreamState(std::ifstream& inputStream) const{
+void WindowBase::resetStreamState(std::ifstream& inputStream) const {
   if(inputStream.eof()){
     try{
       inputStream.setstate(std::ios_base::goodbit);
