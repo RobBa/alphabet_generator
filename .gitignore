@@ -7,7 +7,7 @@ build/
 Test/
 Data/
 
-exampleOutput.txt
+*.txt
 
 # some extra files only on this machine
 Data/example_original.txt

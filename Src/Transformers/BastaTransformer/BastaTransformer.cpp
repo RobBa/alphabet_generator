@@ -104,12 +104,12 @@ void BastaTransformer::convert(){
  * @param stream The netflow as a vector of strings.
  * @return int The encoded netflow.
  */
-int BastaTransformer::encodeStream(const std::string& stream) const{
+unsigned int BastaTransformer::encodeStream(const std::string& stream) const {
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto featureTypeMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureTypeMap();
   const auto featureIndexMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureindexMap();
 
-  int res = 0;
+  unsigned int res = 0;
 
   auto transformParametersCasted = dynamic_cast<BastaFeatures*>(transformParameters);
   if(transformParametersCasted == nullptr){
@@ -118,8 +118,8 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
   else if(stream.size() == 0){
     throw new std::invalid_argument("Error: Tried to encode empty stream.");
   } 
-  
-  int spaceSize = transformParametersCasted->getAllCategoricalDataSize() * transformParametersCasted->getAllRangeValueSize();
+
+  auto spaceSize = static_cast<unsigned int>(transformParametersCasted->getAllCategoricalDataSize()) * static_cast<unsigned int>(transformParametersCasted->getAllRangeValueSize());
 
   auto lineSplit = HelperFunctions::splitString(stream, globalParameters.getInputFileDelimiter());
   
@@ -128,16 +128,19 @@ int BastaTransformer::encodeStream(const std::string& stream) const{
     const auto& rawValue = lineSplit.at(index);
 
     if(feature.second == FeatureBase::FeatureType::categorical){
-      if(!transformParametersCasted->hasCategoricalEntry(feature.first, rawValue)){
-        transformParametersCasted->addCategoricalEntry(feature.first, rawValue);
-      }
-
-      res += transformParametersCasted->getCategoricalValue(feature.first, rawValue) * spaceSize / transformParametersCasted->getCategoricalDataSize(feature.first);
+      /* TODO: the three lines below do not make sense, since for this method we need to know our spaceSize beforehand. Either we preprocess the 
+         file once, or we just give them raw */
+      //if(!transformParametersCasted->hasCategoricalEntry(feature.first, rawValue)){
+      //  transformParametersCasted->addCategoricalEntry(feature.first, rawValue);
+      //}
+      const auto factor = spaceSize / static_cast<unsigned int>(transformParametersCasted->getCategoricalDataSize(feature.first)); // to avoid an overflow
+      res += transformParametersCasted->getCategoricalValue(feature.first, rawValue) * factor;
       spaceSize /= transformParametersCasted->getCategoricalDataSize(feature.first);
     }
     else if(feature.second == FeatureBase::FeatureType::rangeBased){
       const double value = std::stod(rawValue);
-      res += transformParametersCasted->getRangeValue(feature.first, value) * spaceSize / transformParametersCasted->getRangeDataSize(feature.first);
+      const auto factor = spaceSize / static_cast<unsigned int>(transformParametersCasted->getRangeDataSize(feature.first)); // to avoid an overflow
+      res += transformParametersCasted->getRangeValue(feature.first, value) * factor;
       spaceSize /= transformParametersCasted->getRangeDataSize(feature.first);
     }
   }
@@ -163,7 +166,7 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
   static bool filterBySourceAddress = featureInformation->filterBySourceAddress();
 
   if(outputFormat == OutputFileFormat::Abbadingo){
-    std::vector<int> symbols;
+    std::vector<unsigned int> symbols;
 
     std::vector<std::string> lines = window->getWindow(inputStream);
     if(lines.empty()){
@@ -181,7 +184,7 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
         continue;
       }
 
-      const int code = encodeStream(line);
+      const auto code = encodeStream(line);
       alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
       symbols.push_back(code);
     }
@@ -198,9 +201,9 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
       return;
     }
 
-    const int code = encodeStream(line);
-    stream << toAugmentedAbbadingoFormat(sourceAddress->first, lineSplit[featureInformation->getDstIndex()], featureInformation->getAllFeatureNames(),
-                                         code, lineSplit[featureInformation->getLabelIndex()]);
+    const auto code = encodeStream(line);
+    stream << toAugmentedAbbadingoFormat(sourceAddress->first, lineSplit[featureInformation->getDstIndex()], 
+                                         featureInformation->getAllFeatureNames(), code, lineSplit[featureInformation->getLabelIndex()]);
   }
 
   else{

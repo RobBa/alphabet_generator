@@ -173,7 +173,7 @@ const int BastaFeatures::getRangeValue(const std::string& category, const double
  * 
  * @return const int The size of the data.
  */
-const int BastaFeatures::getAllCategoricalDataSize() const{
+const int BastaFeatures::getAllCategoricalDataSize() const {
   static int res = 1;
 
   static bool isComputed = false;
@@ -197,7 +197,7 @@ const int BastaFeatures::getAllCategoricalDataSize() const{
  * 
  * @return const int The size of the data.
  */
-const int BastaFeatures::getAllRangeValueSize() const{
+const int BastaFeatures::getAllRangeValueSize() const {
   static int res = 1;
 
   static bool isComputed = false;
@@ -221,7 +221,7 @@ const int BastaFeatures::getAllRangeValueSize() const{
  * @param category The category to look out for.
  * @return const int The requested size.
  */
-const int BastaFeatures::getCategoricalDataSize(const std::string category) const{
+const int BastaFeatures::getCategoricalDataSize(const std::string category) const {
   return categoricalData.at(category).size();
 }
 
@@ -235,7 +235,7 @@ const int BastaFeatures::getCategoricalDataSize(const std::string category) cons
  * @param category The category to look out for.
  * @return const int The requested size.
  */
-const int BastaFeatures::getRangeDataSize(const std::string category) const{
+const int BastaFeatures::getRangeDataSize(const std::string category) const {
   return clusteringRanges.at(category).size();
 }
 

@@ -20,6 +20,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <sstream>
+
 class TransformerBase{
 protected:
 
@@ -39,14 +41,6 @@ protected:
    */
   virtual void writeEntry(std::stringstream& stream) = 0;
 
-  const std::string toAbbadingoFormat(const std::vector<int>& symbols) const;
-
-  const std::string toAugmentedAbbadingoFormat(const std::string& ip1, 
-                                               const std::string& ip2, 
-                                               const std::vector<std::string>& allFeatures,
-                                               const int symbol, 
-                                               const std::string& flowType) const;
-
 public: 
   TransformerBase();
 
@@ -64,6 +58,56 @@ public:
    * 
    */
   virtual void convert() = 0;
+
+protected:
+  /**
+   * @brief Convert a line to abbadingo format and returns that line.
+   * 
+   * @param symbols The input symbols to convert.
+   * @return const std::string The converted line as a string.
+   */
+  template<typename T>
+  const std::string toAbbadingoFormat(const std::vector<T>& symbols) const {
+    std::stringstream res;
+    res << symbols.size();
+
+    for(const auto symbol: symbols){
+      res << " " << symbol;
+    }
+    res << "\n";
+
+    return res.str();  
+  }
+
+  /**
+  /**
+   * @brief Convert a line to the augmented abbadingo format and returns that line.
+   * 
+   * @param symbols The input symbols to convert.
+   * @return const std::string The converted line as a string.
+   */
+  template<typename T>
+  const std::string toAugmentedAbbadingoFormat(const std::string& ip1, 
+                                                                const std::string& ip2, 
+                                                                const std::vector<std::string>& allFeatures,
+                                                                const T symbol, 
+                                                                const std::string& flowType) const {
+    std::stringstream res;
+    res << ip1 << " <-> " << ip2 << "\n";
+
+    static bool hasInitialized = false;
+    static std::stringstream featureString;
+    if(!hasInitialized && !allFeatures.empty()){
+      featureString << allFeatures.front();
+      for(int i = 0; i < allFeatures.size(); ++i){
+        featureString << "," << allFeatures[i];
+      }
+      hasInitialized = true;
+    }
+
+    res << symbol << ":" << featureString.str() << "/" << flowType;
+    return res.str();
+  }
 };
 
 #endif

@@ -25,7 +25,7 @@ private:
    * @brief Convenience field.
    * 
    */
-  int alphabetSize = 0;
+  unsigned int alphabetSize = 0;
 
   /**
    * @brief Convenience, to save us paths in the main-ini file.
@@ -34,7 +34,7 @@ private:
   const std::string featureIniDir = "../Src/Transformers/BastaTransformer/FeatureParameters/";
 
   void writeEntry(std::stringstream& stream) override;
-  int encodeStream(const std::string& stream) const;
+  unsigned int encodeStream(const std::string& stream) const;
 
 public:   
   BastaTransformer();
