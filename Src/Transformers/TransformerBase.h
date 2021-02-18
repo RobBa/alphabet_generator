@@ -99,13 +99,13 @@ protected:
     static std::stringstream featureString;
     if(!hasInitialized && !allFeatures.empty()){
       featureString << allFeatures.front();
-      for(int i = 0; i < allFeatures.size(); ++i){
+      for(int i = 1; i < allFeatures.size(); ++i){
         featureString << "," << allFeatures[i];
       }
       hasInitialized = true;
     }
 
-    res << symbol << ":" << featureString.str() << "/" << flowType;
+    res << symbol << ":" << featureString.str() << "/" << flowType << "\n";
     return res.str();
   }
 };

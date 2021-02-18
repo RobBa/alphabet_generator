@@ -195,6 +195,9 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
   else if(outputFormat == OutputFileFormat::AugmentedAbbadingo){
     std::string line;
     getline(inputStream, line);
+    if(line.empty()){
+      return;
+    }
 
     const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
@@ -202,7 +205,7 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
     }
 
     const auto code = encodeStream(line);
-    stream << toAugmentedAbbadingoFormat(sourceAddress->first, lineSplit[featureInformation->getDstIndex()], 
+    stream << toAugmentedAbbadingoFormat(lineSplit[sourceAddress->second], lineSplit[featureInformation->getDstIndex()], 
                                          featureInformation->getAllFeatureNames(), code, lineSplit[featureInformation->getLabelIndex()]);
   }
 
