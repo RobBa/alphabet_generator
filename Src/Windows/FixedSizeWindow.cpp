@@ -18,18 +18,43 @@
 #include "HelperFunctions.h"
 
 #include <utility>
+#include <cassert>
 
 std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) const {
   std::vector<std::string> res;
   const static auto& globalParameters = GlobalParameters::getInstance();
 
+  assert(this->size >= this->stride);
+
+  // helpers for stride; TODO: lineBuffer can get rid off, see issue on GitHub
+  static std::vector<std::string> lineBuffer(this->size - this->stride);
+  static bool initialized = false;
+
+  // fill linebuffer once in first step
+  if(!initialized){
+    std::string line;
+    for(int i = 0; i < this->size - this->stride; ++i){
+      getline(inputStream, line);
+      if(line.empty()){
+        continue;
+      }
+      lineBuffer.push_back(std::move(line));
+    }
+  initialized = true;
+  }
+
+  for(auto& line: lineBuffer){
+    res.push_back(std::move(line));
+  }
+  lineBuffer.clear();
+
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
-    for(int i = 0; i < this->size; ++i){
+    for(int i = res.size(); i <= this->size; ++i){ // <= so we match size exactly
       std::string line;
       if(!getline(inputStream, line)){
         return res;
       }
-
+      lineBuffer.push_back(line); // copies element, so we're fine with the move below
       res.push_back(std::move(line));
     }
   }
@@ -38,8 +63,8 @@ std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) 
     // sometimes we only get half a line. Keep on pulling from stream until we have the whole string.
     std::string previousLine;
 
-    int i = 0;
-    while(i < this->size){
+    int i = res.size();
+    while(i <= this->size){ // <= so we match size exactly
       std::string line;
       resetStreamState(inputStream);
 
@@ -67,9 +92,11 @@ std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) 
       }
 
       if(previousLine.empty()){
+        lineBuffer.push_back(line);
         res.push_back(std::move(line));
       }
       else{
+        lineBuffer.push_back(previousLine);
         res.push_back(previousLine); // no move to avoid undefined behavior, rare case in real world
       }
       previousLine.clear();
