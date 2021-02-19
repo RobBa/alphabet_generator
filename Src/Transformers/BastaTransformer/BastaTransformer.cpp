@@ -84,6 +84,8 @@ void BastaTransformer::convert(){
       counter++;
       if(counter >= 10){
         counter = 0;
+        outputStream << outStringStream.str();
+        outStringStream.clear();
         outputStream.flush();
       }
     }
