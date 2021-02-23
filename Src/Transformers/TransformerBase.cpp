@@ -43,3 +43,22 @@ TransformerBase::TransformerBase(){
   inputStream.open(globalParameters.getInputFile(), std::ios_base::in);
   outputStream.open(globalParameters.getOutputFile(), std::ios_base::out);
 }
+
+/**
+ * @brief Contructs a comma separated string out of allFeatures.
+ * 
+ * @param allFeatures The features.
+ * @return const std::string The resulting string.
+ */
+const std::string TransformerBase::getFeatureString(const std::vector<std::string>& allFeatures) const {
+  std::stringstream featureString;
+
+  if(!allFeatures.empty()){
+    featureString << allFeatures.front();
+    for(int i = 1; i < allFeatures.size(); ++i){
+      featureString << "," << allFeatures[i];
+    }
+  }
+
+  return featureString.str();
+}

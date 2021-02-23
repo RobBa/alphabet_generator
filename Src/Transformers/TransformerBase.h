@@ -41,6 +41,8 @@ protected:
    */
   virtual void writeEntry(std::stringstream& stream) = 0;
 
+  const std::string getFeatureString(const std::vector<std::string>& allFeatures) const;
+
 public: 
   TransformerBase();
 
@@ -88,24 +90,15 @@ protected:
    */
   template<typename T>
   const std::string toAugmentedAbbadingoFormat(const std::string& ip1, 
-                                                                const std::string& ip2, 
-                                                                const std::vector<std::string>& allFeatures,
-                                                                const T symbol, 
-                                                                const std::string& flowType) const {
+                                               const std::string& ip2, 
+                                               const std::vector<std::string>& allFeatures,
+                                               const T symbol, 
+                                               const std::string& flowType) const {
     std::stringstream res;
+    static const auto featureString = getFeatureString(allFeatures);
+
     res << ip1 << " <-> " << ip2 << "\n";
-
-    static bool hasInitialized = false;
-    static std::stringstream featureString;
-    if(!hasInitialized && !allFeatures.empty()){
-      featureString << allFeatures.front();
-      for(int i = 1; i < allFeatures.size(); ++i){
-        featureString << "," << allFeatures[i];
-      }
-      hasInitialized = true;
-    }
-
-    res << symbol << ":" << featureString.str() << "/" << flowType << "\n";
+    res << symbol << ":" << featureString << "/" << flowType << "\n";
     return res.str();
   }
 };

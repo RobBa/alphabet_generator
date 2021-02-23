@@ -22,12 +22,18 @@ class FixedSizeWindow : public WindowBase{
 
 private:
   const int size; // The number of netflows the window gathers
+  bool initialized;
 
 public:
   FixedSizeWindow(const int size, const int stride)
    : WindowBase(stride), size(size){};
 
-  virtual std::vector<std::string> getWindow(std::ifstream& inputStream) const override;
+  std::vector<std::string> getWindow(std::ifstream& inputStream) const override;
+  std::vector<std::string> getWindow(std::vector<std::string>& inputStream);
+
+  inline void setIsInitialized(bool init) noexcept {
+    initialized = init;
+  }
 };
 
 #endif

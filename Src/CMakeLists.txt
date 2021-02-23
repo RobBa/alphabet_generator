@@ -1,8 +1,8 @@
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/Transformers"
-                    "${CMAKE_CURRENT_SOURCE_DIR}/Transformers/BastaTransformer"
                     "${CMAKE_CURRENT_SOURCE_DIR}/Windows"
                     "${CMAKE_CURRENT_SOURCE_DIR}/Util"
-                    )
+                    "${CMAKE_CURRENT_SOURCE_DIR}/Transformers/BastaTransformer"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/Transformers/PairwiseBastaTransformer")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Transformers")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Windows")

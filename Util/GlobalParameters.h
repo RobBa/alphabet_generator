@@ -32,7 +32,8 @@ enum class OutputFileFormat{
 };
 
 enum class TransformerType{
-  BastaTransformer
+  BastaTransformer,
+  PairwiseBastaTransformer
 };
 
 enum class WindowType{
@@ -185,6 +186,9 @@ public:
   inline void setTransformerType(const int i){
     if(i == 0){
       this->transformerType = TransformerType::BastaTransformer;
+    }
+    else if(i == 1){
+      this->transformerType = TransformerType::PairwiseBastaTransformer;
     }
     else{
       throw new std::invalid_argument("Transformer type argument not implemented.");

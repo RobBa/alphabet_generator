@@ -13,13 +13,13 @@
  * 
  */
 
-#ifndef _DISCRETE_TRANSFORMER_
-#define _DISCRETE_TRANSFORMER_
+#ifndef _BASTA_TRANSFORMER_
+#define _BASTA_TRANSFORMER_
 
 #include "TransformerBase.h"
 #include "FixedSizeWindow.h"
 
-class BastaTransformer : public TransformerBase{
+class BastaTransformer : public TransformerBase {
 private:
   /**
    * @brief Convenience field.
@@ -33,6 +33,9 @@ private:
    */
   const std::string featureIniDir = "../Src/Transformers/BastaTransformer/FeatureParameters/";
 
+protected:
+  /* Dummy constructor to access */
+  BastaTransformer(bool derived) : TransformerBase(){};
   void writeEntry(std::stringstream& stream) override;
   unsigned int encodeStream(const std::string& stream) const;
 

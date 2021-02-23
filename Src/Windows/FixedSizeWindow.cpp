@@ -20,6 +20,13 @@
 #include <utility>
 #include <cassert>
 
+
+/**
+ * @brief Extracts window out of input stream and returns it. TODO: not 100% functional. Debug
+ * 
+ * @param inputStream The input stream.
+ * @return std::vector<std::string> The window.
+ */
 std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) const {
   std::vector<std::string> res;
   const static auto& globalParameters = GlobalParameters::getInstance();
@@ -107,5 +114,67 @@ std::vector<std::string> FixedSizeWindow::getWindow(std::ifstream& inputStream) 
     throw new std::invalid_argument("Streaming mode not implemented in FixedSizeWindow.");
   }
 
+  return res;
+}
+
+/**
+ * @brief Extracts window out of input stream, represented by vector of strings, and returns it.
+ * 
+ * @param inputStream The input stream.
+ * @return std::vector<std::string> The window.
+ */
+std::vector<std::string> FixedSizeWindow::getWindow(std::vector<std::string>& inputStream) {
+  std::vector<std::string> res;
+  const static auto& globalParameters = GlobalParameters::getInstance();
+
+  assert(this->size >= this->stride);
+
+  static std::vector<std::string> lineBuffer;
+
+  // fill linebuffer once in first step
+  if(!this->initialized){
+    lineBuffer.clear();
+    std::string line;
+    while(lineBuffer.size() < this->size - this->stride){
+      if(inputStream.empty()){
+        res = lineBuffer;
+        assert(res.size() <= this->size);
+        return res;
+      }
+
+      line = std::move(inputStream.front());
+      inputStream.erase(inputStream.begin());
+      if(line.empty()){
+        continue;
+      }
+      lineBuffer.push_back(std::move(line));
+    }
+  this->initialized = true;
+  }
+
+  for(auto& line: lineBuffer){
+    res.push_back(std::move(line));
+  }
+  lineBuffer.clear();
+
+  if(globalParameters.getStreamMode() == StreamMode::BatchMode){
+    for(int i = res.size(); i < this->size; ++i){
+      if(inputStream.empty()){
+        return res;
+      }
+
+      lineBuffer.push_back(inputStream.front()); // copies element, so we're fine with the move below
+      res.push_back(std::move(inputStream.front()));
+      inputStream.erase(inputStream.begin());
+    }
+  }
+
+  else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
+    throw new std::invalid_argument("Stream mode not implemented in this overload of FixedSizeWindow.");
+  }
+  else{
+    throw new std::invalid_argument("Streaming mode not implemented in FixedSizeWindow.");
+  }
+  assert(res.size() <= this->size);
   return res;
 }

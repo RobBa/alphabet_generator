@@ -191,7 +191,7 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
       symbols.push_back(code);
     }
 
-      stream << toAbbadingoFormat(symbols);
+    stream << toAbbadingoFormat(symbols);
   }
 
   else if(outputFormat == OutputFileFormat::AugmentedAbbadingo){

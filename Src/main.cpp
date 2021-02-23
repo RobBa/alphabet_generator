@@ -38,12 +38,15 @@ int main(int argc, char **argv){
   HelperFunctions::parseInput(argv[1]);
 
   // TODO: implement this is in a nicer factory design pattern
-  switch(GlobalParameters::getInstance().getTransformerType()){
-    case TransformerType::BastaTransformer:
-      auto transformer = new BastaTransformer;
-        transformer->convert();
-        free(transformer);
-        break;
+  if(GlobalParameters::getInstance().getTransformerType() == TransformerType::BastaTransformer){
+    auto transformer = new BastaTransformer;
+    transformer->convert();
+    free(transformer);
+  }
+  else if(GlobalParameters::getInstance().getTransformerType() == TransformerType::PairwiseBastaTransformer){
+    auto transformer = new PairwiseBastaTransformer;
+    transformer->convert();
+    free(transformer);
   }
   //auto transformer = TransformerFactory::createTransformer();
   return 0;

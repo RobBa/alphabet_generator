@@ -11,6 +11,7 @@
 
 #include "TransformerBase.h"
 #include "BastaTransformer.h"
+#include "PairwiseBastaTransformer.h"
 
 #include "GlobalParameters.h"
 

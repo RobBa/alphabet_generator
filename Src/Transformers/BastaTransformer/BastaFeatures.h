@@ -16,18 +16,8 @@
 
 #include <memory>
 
-
-class BastaFeatures : public FeatureBase{
+class BastaFeatures : public FeatureBase {
 private:
-
-  /**
-   * @brief In case we want to parse a file for a source address. 
-   * Has the address and the index in the split entry of the input 
-   * file.
-   * 
-   */
-  std::unique_ptr< std::pair<std::string, int> > sourceAddressPair = nullptr;
-
   /**
    * @brief Convenience field, if we want to filter input parse by specific 
    * source address only.
@@ -37,6 +27,16 @@ private:
    * 
    */
   bool filterSourceAddress = false;
+
+protected:
+
+  /**
+   * @brief In case we want to parse a file for a source address. 
+   * Has the address and the index in the split entry of the input 
+   * file.
+   * 
+   */
+  std::unique_ptr< std::pair<std::string, int> > sourceAddressPair = nullptr;
 
   /**
    * @brief Convenience field. Index pointing to the destination field after
