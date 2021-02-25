@@ -89,12 +89,13 @@ void PairwiseBastaTransformer::writeEntry(std::stringstream& stream){
  * @param stream Stream to write to.
  * @param host The host we will transform to a string.
  */
-void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const std::pair< std::string, Host > host) const {
+void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host) const {
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
   static auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
 
   const auto& ipAddress = host.first;
+  const auto label = host.second.getLabel();
 
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
     for(auto& dst: host.second.getNetflows()){
@@ -107,7 +108,7 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
       unsigned int lineCount = 0;
       std::set<unsigned int> symbolSet; // keep track of size of alphabet for this host
 
-      std::vector<unsigned int> symbols; 
+      std::vector<unsigned int> symbols;
 
       dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
       auto flows = dst.second;
@@ -126,7 +127,7 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
 
         assert(symbols.size() <= globalParameters.getWindowSize());
 
-        symbolString << toAbbadingoFormat(symbols);
+        symbolString << toAbbadingoFormat(symbols, label);
         symbols.clear();
         ++lineCount;
       }

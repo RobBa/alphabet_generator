@@ -59,6 +59,12 @@ protected:
   std::vector<std::string> allFeatures;
 
   /**
+   * @brief Store the labels
+   * 
+   */
+  std::map<std::string, int> labels;
+
+  /**
    * @brief We map categorical data to ranges.
    * 
    * We chose an unordered map, because apart from iteration, it is faster than a map.
@@ -103,6 +109,14 @@ public:
 
   inline const auto filterBySourceAddress() const {
     return this->filterSourceAddress;
+  }
+
+  inline bool hasLabels() const noexcept {
+    return !this->labels.empty();
+  }
+
+  inline const int getLabel(const std::string& label) const {
+    return this->labels.at(label);
   }
 
   const int getCategoricalValue(const std::string& category, const std::string& name);

@@ -28,14 +28,26 @@ private:
    */
   std::unordered_map<std::string, std::vector<std::string> > netflows;
 
+  int label = 0;
+
 public:
   Host() = default;
 
   void addNetflow(const std::string& ipAddress, const std::string& netflow);
-  std::vector<std::string> getConnection(const std::string& dstAddress) const;
+  void addNetflow(const std::string& ipAddress, const std::string& netflow, const int label);
   
+  std::vector<std::string> getConnection(const std::string& dstAddress) const;
+
   inline auto getNetflows() const {
     return this->netflows;
+  }
+
+  inline void setlabel(int label) noexcept {
+    this->label = label;
+  }
+
+  inline const auto getLabel() const noexcept {
+    return label;
   }
 };
 

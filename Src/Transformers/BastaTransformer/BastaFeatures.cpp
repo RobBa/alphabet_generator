@@ -20,6 +20,7 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+#include <string>
 
 
 /**
@@ -69,9 +70,18 @@ void BastaFeatures::initFromFile(const std::string& filePath){
 
       std::vector<double> ranges;
       for(int i = 2; i < lineSplit.size() - 2; ++i){
-        ranges.push_back(stod(lineSplit[i]));
+        ranges.push_back(std::stod(lineSplit[i]));
       }
       this->setRanges(feature, ranges);
+    }
+    else if(feature == "Label"){
+      const auto& labels = HelperFunctions::splitString(std::string(category), ',', true);
+      int i = 0;
+      for(const auto& label: labels){
+        this->labels[label] = i;
+        ++i;
+      }
+      this->labelIndex = std::stoi(value);
     }
 
     else if(feature == "SourceAddress"){
@@ -84,7 +94,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else if(feature == "SrcIndex"){
-      const auto index = stoi(value);
+      const auto index = std::stoi(value);
       if(this->sourceAddressPair == nullptr){
         this->sourceAddressPair = std::make_unique< std::pair<std::string, int> >(std::make_pair("", index));
         continue;
@@ -93,11 +103,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
     }
 
     else if(feature == "DstIndex"){
-      this->dstAddressIndex = stoi(value);
-    }
-
-    else if(feature == "LabelIndex"){
-      this->labelIndex = stoi(value);
+      this->dstAddressIndex = std::stoi(value);
     }
 
     else if(feature == "HasHeader"){
@@ -117,7 +123,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
         throw new std::invalid_argument("Feature " + feature + "not registered in BastaFeatures-Parser.");
     }
 
-    this->featureIndexMap[feature] = stoi(value);
+    this->featureIndexMap[feature] = std::stoi(value);
   }
 }
 

@@ -21,6 +21,7 @@ namespace HelperFunctions{
 
   std::vector<std::string> splitString(const std::string& input, const char delimiter);
   std::vector<std::string> splitString(std::string& input, const char delimiter, bool replaceTabs);
+  std::vector<std::string> splitString(std::string&& input, const char delimiter, bool replaceTabs);
 }
 
 #endif

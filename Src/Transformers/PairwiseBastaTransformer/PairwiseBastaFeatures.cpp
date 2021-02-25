@@ -15,6 +15,7 @@
 
 void PairwiseBastaFeatures::preprocessInput(std::ifstream& inputStream){
   const auto& globalParameters = GlobalParameters::getInstance();
+
   std::string line;
 
   while(!inputStream.eof()){
@@ -26,6 +27,12 @@ void PairwiseBastaFeatures::preprocessInput(std::ifstream& inputStream){
     // inefficient, but compatible with later code.
     const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     const auto& sourceAddress = lineSplit[sourceAddressPair->second];
-    hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line);
+    if(!labels.empty()){
+      const auto& rawLabel = lineSplit[labelIndex];
+      hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line, labels[rawLabel]);
+    }
+    else{
+      hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line);
+    }
   }
 }

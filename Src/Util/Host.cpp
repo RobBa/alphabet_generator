@@ -20,3 +20,16 @@
 void Host::addNetflow(const std::string& ipAddress, const std::string& netflow){
   netflows[ipAddress].push_back(netflow);
 }
+
+/**
+ * @brief Adds a piece of netflow into the stored netflows.
+ * 
+ * @param ipAddress The ip-address we want to add to.
+ * @param netflow The netflow.
+ */
+void Host::addNetflow(const std::string& ipAddress, const std::string& netflow, const int label){
+  netflows[ipAddress].push_back(netflow);
+  if(label != 0 && this->label == 0){
+    this->label = label;
+  }
+}

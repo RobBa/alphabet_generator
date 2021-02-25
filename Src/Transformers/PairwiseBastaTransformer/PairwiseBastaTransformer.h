@@ -33,7 +33,7 @@ private:
   const std::string featureIniDir = "../Src/Transformers/PairwiseBastaTransformer/FeatureParameters/";
 
   void writeEntry(std::stringstream& stream) override;
-  void writeConnection(std::stringstream& stream, const std::pair< std::string, Host > host) const;
+  void writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host) const;
 
 public:   
   PairwiseBastaTransformer();

@@ -72,3 +72,20 @@ std::vector<std::string> HelperFunctions::splitString(std::string& input, const 
 
   return splitString(input, delimiter);
 }
+
+/**
+ * @brief Splits string and returns vector of string.
+ * Removes all the tabs in a preliminary step if removeTabs set to true.
+ * 
+ * @param input The input string.
+ * @param delimiter The delimiter.
+ * @param replaceTabs Replace the tabs by delimiter in preliminary step if set to true.
+ * @return std::vector<std::string> Split (past tense) string returned as vector of substrings.
+ */
+std::vector<std::string> HelperFunctions::splitString(std::string&& input, const char delimiter, bool replaceTabs){
+  if(replaceTabs){
+    HelperFunctions::replaceCharacters(input, '\t', ' ');
+  }
+
+  return splitString(input, delimiter);
+}
