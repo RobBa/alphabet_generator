@@ -46,7 +46,6 @@ PairwiseBastaTransformer::PairwiseBastaTransformer() : BastaTransformer(true) {
 void PairwiseBastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto& outputFormat = globalParameters.getOutputfileFormat();
 
   const auto featureParameters = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
 

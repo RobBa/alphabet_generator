@@ -49,7 +49,7 @@ BastaTransformer::BastaTransformer() : TransformerBase() {
 void BastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto& outputFormat = globalParameters.getOutputfileFormat();
+  const auto& outputFormat = dynamic_cast<BastaFeatures*>(transformParameters)->getOutputFormat();
 
   std::stringstream outStringStream;
   int linecount = 0;
@@ -65,7 +65,7 @@ void BastaTransformer::convert(){
       linecount++;
     }
 
-    if(outputFormat == OutputFileFormat::Abbadingo){
+    if(outputFormat == BastaOutputFormat::Abbadingo){
       outputStream << linecount << " " << alphabetSize << "\n";
     }
 
@@ -161,13 +161,13 @@ unsigned int BastaTransformer::encodeStream(const std::string& stream) const {
 void BastaTransformer::writeEntry(std::stringstream& stream){
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
-  const auto& outputFormat = globalParameters.getOutputfileFormat();
+  const auto& outputFormat = dynamic_cast<BastaFeatures*>(transformParameters)->getOutputFormat();
 
   const auto& featureIndexMap = featureInformation->getFeatureindexMap();
   const auto& sourceAddress = featureInformation->getSourceAddressPair();
   static bool filterBySourceAddress = featureInformation->filterBySourceAddress();
 
-  if(outputFormat == OutputFileFormat::Abbadingo){
+  if(outputFormat == BastaOutputFormat::Abbadingo){
     std::vector<unsigned int> symbols;
 
     std::vector<std::string> lines = window->getWindow(inputStream);
@@ -194,7 +194,7 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
     stream << toAbbadingoFormat(symbols);
   }
 
-  else if(outputFormat == OutputFileFormat::AugmentedAbbadingo){
+  else if(outputFormat == BastaOutputFormat::AugmentedAbbadingo){
     std::string line;
     getline(inputStream, line);
     if(line.empty()){

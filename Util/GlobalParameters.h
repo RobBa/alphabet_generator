@@ -22,15 +22,6 @@ enum class StreamMode{
   StreamMode
 };
 
-enum class InputFileFormat{
-  Netflow
-};
-
-enum class OutputFileFormat{
-  Abbadingo,
-  AugmentedAbbadingo
-};
-
 enum class TransformerType{
   BastaTransformer,
   PairwiseBastaTransformer
@@ -60,8 +51,6 @@ private:
   char inputFileNewlineCharacter = '\n';
   
   StreamMode streamMode;
-  InputFileFormat ifFormat;
-  OutputFileFormat ofFormat;
   TransformerType transformerType;
   WindowType windowType;
 
@@ -106,14 +95,6 @@ public:
 
   inline const auto getStreamMode() const{
     return streamMode;
-  }
-
-  inline const auto getInputfileFormat() const{
-    return ifFormat;
-  }
-
-  inline const auto getOutputfileFormat() const{
-    return ofFormat;
   }
 
   inline const auto getTransformerType() const{
@@ -162,27 +143,6 @@ public:
     }
   }
 
-  inline void setInputfileFormat(const int i){
-    if(i == 0){
-      this->ifFormat = InputFileFormat::Netflow;
-    }
-    else{
-      throw new std::invalid_argument("Input file format argument not implemented.");
-    }
-  }
-
-  inline void setOutputfileFormat(const int i){
-    if(i == 0){
-      this->ofFormat = OutputFileFormat::Abbadingo;
-    }
-    else if(i == 1){
-      this->ofFormat = OutputFileFormat::AugmentedAbbadingo;
-    }
-    else{
-      throw new std::invalid_argument("Output file format argument not implemented.");
-    }
-  }
-
   inline void setTransformerType(const int i){
     if(i == 0){
       this->transformerType = TransformerType::BastaTransformer;
@@ -194,8 +154,8 @@ public:
       throw new std::invalid_argument("Transformer type argument not implemented.");
     }
   }
-
-  inline void setWindowType(const int i){
+  
+    inline void setWindowType(const int i){
     if(i == 0){
       this->windowType = WindowType::FixedSizeWindow;
     }

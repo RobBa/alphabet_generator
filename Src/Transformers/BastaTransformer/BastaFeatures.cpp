@@ -118,7 +118,18 @@ void BastaFeatures::initFromFile(const std::string& filePath){
       }
       continue;
     }
-
+    else if(feature == "outputFileFormat"){
+      const auto intValue = std::stoi(value);
+      if(intValue == 0){
+        this->ofFormat == BastaOutputFormat::Abbadingo;
+      }
+      else if(intValue == 1){
+        this->ofFormat == BastaOutputFormat::AugmentedAbbadingo;
+      }
+      else{
+        throw new std::invalid_argument("Argument " + value + "for outputFileFormat in the feature's .ini is invalid.");
+      }
+    }
     else{
         throw new std::invalid_argument("Feature " + feature + "not registered in BastaFeatures-Parser.");
     }

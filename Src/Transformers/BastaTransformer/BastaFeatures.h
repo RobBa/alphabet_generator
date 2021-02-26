@@ -16,8 +16,17 @@
 
 #include <memory>
 
+enum class BastaOutputFormat{
+  Abbadingo,
+  AugmentedAbbadingo
+};
+
 class BastaFeatures : public FeatureBase {
 private:
+  friend class BastaTransformer;
+
+  BastaOutputFormat ofFormat;
+
   /**
    * @brief Convenience field, if we want to filter input parse by specific 
    * source address only.
@@ -27,6 +36,15 @@ private:
    * 
    */
   bool filterSourceAddress = false;
+
+  /**
+   * @brief Get the Output Format object.
+   * 
+   * @return BastaOutputFormat 
+   */
+  inline BastaOutputFormat getOutputFormat() const noexcept {
+    return ofFormat;
+  }
 
 protected:
 

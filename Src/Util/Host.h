@@ -1,5 +1,5 @@
 /**
- * @file Connection.h
+ * @file Host.h
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
  * @brief Class where we model a host.
  * @version 0.1
@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef _CONNECTION_
-#define _CONNECTION_
+#ifndef _HOST_
+#define _HOST_
 
 #include <string>
 #include <vector>

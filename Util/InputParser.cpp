@@ -66,12 +66,6 @@ void HelperFunctions::parseInput(const std::string& path){
       }
       globalParameters.setDelimiter(delimiter.front());
     }
-    else if(indicator == "inputFileFormat"){
-      globalParameters.setInputfileFormat(std::stoi(value));
-    }
-    else if(indicator == "outputFileFormat"){
-      globalParameters.setOutputfileFormat(std::stoi(value));
-    }
     else if(indicator == "transformerType"){
       globalParameters.setTransformerType(std::stoi(value));
     }
