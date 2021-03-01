@@ -13,8 +13,8 @@
  * 
  */
 
-#include "BastaTransformer.h"
-#include "BastaFeatures.h"
+#include "StreamingBastaTransformer.h"
+#include "StreamingBastaFeatures.h"
 #include "HelperFunctions.h"
 
 #include <sstream>
@@ -28,12 +28,12 @@
  * @brief The constructor.
  * 
  */
-BastaTransformer::BastaTransformer() : TransformerBase() {
+StreamingBastaTransformer::StreamingBastaTransformer() : TransformerBase() {
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto& featureIniFile = globalParameters.getFeatureIni();
 
-  transformParameters = new BastaFeatures;
-  dynamic_cast<BastaFeatures*>(transformParameters)->initFromFile(featureIniDir + featureIniFile);
+  transformParameters = new StreamingBastaFeatures;
+  dynamic_cast<StreamingBastaFeatures*>(transformParameters)->initFromFile(featureIniDir + featureIniFile);
 
   if(transformParameters->hasHeader()){
     // skip one line, so we don't read in header accidentally
@@ -46,10 +46,10 @@ BastaTransformer::BastaTransformer() : TransformerBase() {
  * @brief Main function where conversion takes place.
  * 
  */
-void BastaTransformer::convert(){
+void StreamingBastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto& outputFormat = dynamic_cast<BastaFeatures*>(transformParameters)->getOutputFormat();
+  const auto& outputFormat = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getOutputFormat();
 
   std::stringstream outStringStream;
   int linecount = 0;
@@ -106,16 +106,16 @@ void BastaTransformer::convert(){
  * @param stream The netflow as a vector of strings.
  * @return int The encoded netflow.
  */
-unsigned int BastaTransformer::encodeStream(const std::string& stream) const {
+unsigned int StreamingBastaTransformer::encodeStream(const std::string& stream) const {
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto featureTypeMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureTypeMap();
-  const auto featureIndexMap = dynamic_cast<BastaFeatures*>(transformParameters)->getFeatureindexMap();
+  const auto featureTypeMap = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getFeatureTypeMap();
+  const auto featureIndexMap = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getFeatureindexMap();
 
   unsigned int res = 0;
 
-  auto transformParametersCasted = dynamic_cast<BastaFeatures*>(transformParameters);
+  auto transformParametersCasted = dynamic_cast<StreamingBastaFeatures*>(transformParameters);
   if(transformParametersCasted == nullptr){
-    throw new std::invalid_argument("encodeStream-method can only be used in conjunction with transformParameters of type BastaFeatures.");
+    throw new std::invalid_argument("encodeStream-method can only be used in conjunction with transformParameters of type StreamingBastaFeatures.");
   }
   else if(stream.size() == 0){
     throw new std::invalid_argument("Error: Tried to encode empty stream.");
@@ -158,10 +158,10 @@ unsigned int BastaTransformer::encodeStream(const std::string& stream) const {
  * @param inputStream The input stream.
  * @return const std::string The string.
  */
-void BastaTransformer::writeEntry(std::stringstream& stream){
+void StreamingBastaTransformer::writeEntry(std::stringstream& stream){
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
-  const auto& outputFormat = dynamic_cast<BastaFeatures*>(transformParameters)->getOutputFormat();
+  const auto featureInformation = dynamic_cast<StreamingBastaFeatures*>(transformParameters);
+  const auto& outputFormat = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getOutputFormat();
 
   const auto& featureIndexMap = featureInformation->getFeatureindexMap();
   const auto& sourceAddress = featureInformation->getSourceAddressPair();
@@ -212,6 +212,6 @@ void BastaTransformer::writeEntry(std::stringstream& stream){
   }
 
   else{
-    throw new std::invalid_argument("Output format not implemented in BastaTransformer.");
+    throw new std::invalid_argument("Output format not implemented in StreamingBastaTransformer.");
   }
 };

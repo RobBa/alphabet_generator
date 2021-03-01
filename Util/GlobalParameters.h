@@ -23,7 +23,7 @@ enum class StreamMode{
 };
 
 enum class TransformerType{
-  BastaTransformer,
+  StreamingBastaTransformer,
   PairwiseBastaTransformer
 };
 
@@ -145,7 +145,7 @@ public:
 
   inline void setTransformerType(const int i){
     if(i == 0){
-      this->transformerType = TransformerType::BastaTransformer;
+      this->transformerType = TransformerType::StreamingBastaTransformer;
     }
     else if(i == 1){
       this->transformerType = TransformerType::PairwiseBastaTransformer;

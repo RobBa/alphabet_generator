@@ -1,7 +1,7 @@
 /**
- * @file BastaFeatures.h
+ * @file StreamingBastaFeatures.h
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
- * @brief Transforminformation of the BastaTransformer.
+ * @brief Transforminformation of the StreamingBastaTransformer.
  * @version 0.1
  * @date 2021-02-12
  * 
@@ -21,21 +21,11 @@ enum class BastaOutputFormat{
   AugmentedAbbadingo
 };
 
-class BastaFeatures : public FeatureBase {
+class StreamingBastaFeatures : public FeatureBase {
 private:
-  friend class BastaTransformer;
+  friend class StreamingBastaTransformer;
 
   BastaOutputFormat ofFormat;
-
-  /**
-   * @brief Convenience field, if we want to filter input parse by specific 
-   * source address only.
-   * 
-   * Is set if .ini file has a "SourceAddress" parameter specified, see 
-   * FeatureParameters/example.ini
-   * 
-   */
-  bool filterSourceAddress = false;
 
   /**
    * @brief Get the Output Format object.
@@ -47,6 +37,16 @@ private:
   }
 
 protected:
+
+  /**
+   * @brief Convenience field, if we want to filter input parse by specific 
+   * source address only.
+   * 
+   * Is set if .ini file has a "SourceAddress" parameter specified, see 
+   * FeatureParameters/example.ini
+   * 
+   */
+  bool filterSourceAddress = false;
 
   /**
    * @brief In case we want to parse a file for a source address. 
@@ -102,8 +102,8 @@ protected:
   void setRanges(const std::string& category, std::vector<double>& ranges);
 
 public:
-  BastaFeatures() = default;
-  BastaFeatures(const std::string& filePath){
+  StreamingBastaFeatures() = default;
+  StreamingBastaFeatures(const std::string& filePath){
     this->initFromFile(filePath);
   }
 

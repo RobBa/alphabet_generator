@@ -1,7 +1,7 @@
 /**
- * @file BastaFeatures.cpp
+ * @file StreamingBastaFeatures.cpp
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
- * @brief Transforminformation of the BastaTransformer.
+ * @brief Transforminformation of the StreamingBastaTransformer.
  * @version 0.1
  * @date 2021-02-12
  * 
@@ -10,7 +10,7 @@
  */
 
 
-#include "BastaFeatures.h"
+#include "StreamingBastaFeatures.h"
 #include "HelperFunctions.h"
 
 #include <algorithm>
@@ -28,7 +28,7 @@
  * 
  * @param filePath Path to the .ini-file of the features.
  */
-void BastaFeatures::initFromFile(const std::string& filePath){
+void StreamingBastaFeatures::initFromFile(const std::string& filePath){
   // From https://stackoverflow.com/a/27588225
   std::ifstream test(filePath); 
   if (!test){
@@ -131,7 +131,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
       }
     }
     else{
-        throw new std::invalid_argument("Feature " + feature + "not registered in BastaFeatures-Parser.");
+        throw new std::invalid_argument("Feature " + feature + "not registered in StreamingBastaFeatures-Parser.");
     }
 
     this->featureIndexMap[feature] = std::stoi(value);
@@ -146,7 +146,7 @@ void BastaFeatures::initFromFile(const std::string& filePath){
  * @param name The name of the value, e.g. "TCP" in protocol.
  * @return int The assigned integer value.
  */
-const int BastaFeatures::getCategoricalValue(const std::string& category, const std::string& name){
+const int StreamingBastaFeatures::getCategoricalValue(const std::string& category, const std::string& name){
   if(categoricalData.count(category) == 0){
     throw new std::invalid_argument("Category does not exist.");
   }
@@ -162,7 +162,7 @@ const int BastaFeatures::getCategoricalValue(const std::string& category, const 
  * @param value The value.
  * @return const int Within cluster value.
  */
-const int BastaFeatures::getRangeValue(const std::string& category, const double value){
+const int StreamingBastaFeatures::getRangeValue(const std::string& category, const double value){
   int res = 0;
 
   if(clusteringRanges.count(category) == 0){
@@ -190,7 +190,7 @@ const int BastaFeatures::getRangeValue(const std::string& category, const double
  * 
  * @return const int The size of the data.
  */
-const int BastaFeatures::getAllCategoricalDataSize() const {
+const int StreamingBastaFeatures::getAllCategoricalDataSize() const {
   static int res = 1;
 
   static bool isComputed = false;
@@ -214,7 +214,7 @@ const int BastaFeatures::getAllCategoricalDataSize() const {
  * 
  * @return const int The size of the data.
  */
-const int BastaFeatures::getAllRangeValueSize() const {
+const int StreamingBastaFeatures::getAllRangeValueSize() const {
   static int res = 1;
 
   static bool isComputed = false;
@@ -238,7 +238,7 @@ const int BastaFeatures::getAllRangeValueSize() const {
  * @param category The category to look out for.
  * @return const int The requested size.
  */
-const int BastaFeatures::getCategoricalDataSize(const std::string category) const {
+const int StreamingBastaFeatures::getCategoricalDataSize(const std::string category) const {
   return categoricalData.at(category).size();
 }
 
@@ -252,7 +252,7 @@ const int BastaFeatures::getCategoricalDataSize(const std::string category) cons
  * @param category The category to look out for.
  * @return const int The requested size.
  */
-const int BastaFeatures::getRangeDataSize(const std::string category) const {
+const int StreamingBastaFeatures::getRangeDataSize(const std::string category) const {
   return clusteringRanges.at(category).size();
 }
 
@@ -269,7 +269,7 @@ const int BastaFeatures::getRangeDataSize(const std::string category) const {
  * @param category Name of the category.
  * @param name Name of the entry of the category.
  */
-void BastaFeatures::addCategoricalEntry(const std::string& category, const std::string& name){
+void StreamingBastaFeatures::addCategoricalEntry(const std::string& category, const std::string& name){
   auto& categoryMap = categoricalData.at(category);
   if(categoryMap.count(name) == 0){
     categoryMap[name] = categoryMap.size() + 1;
@@ -283,7 +283,7 @@ void BastaFeatures::addCategoricalEntry(const std::string& category, const std::
  * @param category Name of the category.
  * @param name Name of the entry to be checked.
  */
-bool BastaFeatures::hasCategoricalEntry(const std::string& category, const std::string& name) const {
+bool StreamingBastaFeatures::hasCategoricalEntry(const std::string& category, const std::string& name) const {
   const auto& categoryMap = categoricalData.at(category);
   if(categoryMap.count(name) == 0){
     return false;
@@ -302,7 +302,7 @@ bool BastaFeatures::hasCategoricalEntry(const std::string& category, const std::
  * 
  * @param names A string of all the names in the category.
  */
-  void BastaFeatures::setCategoricalData(const std::string& category, const std::vector<std::string>& names){
+  void StreamingBastaFeatures::setCategoricalData(const std::string& category, const std::vector<std::string>& names){
 
   // first make sure that key is clean to have consistent behavior in the methods
   categoricalData.erase(category);
@@ -331,7 +331,7 @@ bool BastaFeatures::hasCategoricalEntry(const std::string& category, const std::
  * @param name The name of the range-parameter.
  * @param ranges Ranges in sorted or unsorted order.
  */
-void BastaFeatures::setRanges(const std::string& category, std::vector<double>& ranges){
+void StreamingBastaFeatures::setRanges(const std::string& category, std::vector<double>& ranges){
 
   // first make sure that key is clean to have consistent behavior in the methods
   clusteringRanges.erase(category);

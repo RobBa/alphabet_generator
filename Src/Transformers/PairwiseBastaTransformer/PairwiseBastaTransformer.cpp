@@ -3,7 +3,7 @@
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
  * @brief Implementation of the PairwiseBastaTransformer
  * 
- * The sequences can for example be used as an input alphabet for state machines. 
+ * The sequences can for example be used as an input alphabet for state machines.
  * 
  * @version 0.1
  * @date 2021-02-19
@@ -23,7 +23,7 @@
  * @brief The constructor.
  * 
  */
-PairwiseBastaTransformer::PairwiseBastaTransformer() : BastaTransformer(true) {
+PairwiseBastaTransformer::PairwiseBastaTransformer() : StreamingBastaTransformer(true) {
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto& featureIniFile = globalParameters.getFeatureIni();
 
@@ -53,13 +53,25 @@ void PairwiseBastaTransformer::convert(){
 
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
     const auto hosts = featureParameters->getHosts();
-    for(const auto& host: hosts){
-      writeConnection(outStringStream, host);
+    const auto filterBySourceAddress = featureParameters->filterBySourceAddress();
 
+    if(filterBySourceAddress){
+      const auto& hostAddress = featureParameters->getSourceAddressPair()->first;
+      const auto& host = hosts.at(hostAddress);
+
+      writeConnection(outStringStream, hostAddress, host);
       outputStream << outStringStream.str();
-      outStringStream.clear();
       outputStream.flush();
     }
+    else{
+      for(const auto& host: hosts){
+        writeConnection(outStringStream, host);
+
+        outputStream << outStringStream.str();
+        outStringStream.clear();
+        outputStream.flush();
+      }
+    }   
 
     outputStream.close();
     inputStream.close();
@@ -90,7 +102,7 @@ void PairwiseBastaTransformer::writeEntry(std::stringstream& stream){
  */
 void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host) const {
   const auto& globalParameters = GlobalParameters::getInstance();
-  const auto featureInformation = dynamic_cast<BastaFeatures*>(transformParameters);
+  const auto featureInformation = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
   static auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
 
   const auto& ipAddress = host.first;
@@ -135,5 +147,66 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
   }
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
     throw new std::invalid_argument("Stream mode not implemented in PairwiseBastaTransformer.");
+  }
+}
+
+/**
+ * @brief Converts all connections of one host to to abbadingo.
+ * 
+ * Whether we get all netflows pairwise or just process the entire host and do omit the dst-information
+ * can be set in the parameters of the transformer.
+ * 
+ * @param stream The stream to write to.
+ * @param hostAddress The address of the host.
+ * @param host The host object.
+ */
+void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const std::string& hostAddress, const Host& host) const {
+  const auto& globalParameters = GlobalParameters::getInstance();
+  const auto featureInformation = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
+  static auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
+
+  static const bool filterByDst = featureInformation->filterByDestination();
+
+  const auto label = host.getLabel();
+
+  if(globalParameters.getStreamMode() == StreamMode::BatchMode){
+    stream << "Host address: " << hostAddress << "\n";
+    stream << "Features: " << featureString << "\n";
+
+    unsigned int lineCount = 0;
+
+    std::unordered_map<unsigned int, unsigned int> symbolSet; // keep track of size of alphabet for this host
+    std::stringstream symbolString;
+
+    for(auto& dst: host.getNetflows()){
+      std::vector<unsigned int> symbols;
+
+      dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
+      auto flows = dst.second;
+
+      while(!flows.empty()){
+        auto lines = dynamic_cast<FixedSizeWindow*>(window)->getWindow(flows); // TODO: we could spare the copy here
+        for(auto& line: lines){
+          if(line.empty()){
+            continue;
+          }
+
+          const auto code = encodeStream(line);
+          if(symbolSet.count(code) == 0){
+            // make the symbols outnumbered from zero to size
+            symbolSet[code] = symbolSet.size();
+          }
+
+          symbols.push_back(symbolSet.at(code));
+        }
+
+        assert(symbols.size() <= globalParameters.getWindowSize());
+
+        symbolString << toAbbadingoFormat(symbols, label);
+        symbols.clear();
+        ++lineCount;
+      }
+    }
+    stream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
   }
 }

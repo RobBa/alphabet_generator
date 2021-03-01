@@ -14,8 +14,8 @@
 TransformerBase* TransformerFactory::createTransformer(){
   const auto& globalParameters = GlobalParameters::getInstance();
 
-  if(globalParameters.getTransformerType() == TransformerType::BastaTransformer){
-    return new BastaTransformer;
+  if(globalParameters.getTransformerType() == TransformerType::StreamingBastaTransformer){
+    return new StreamingBastaTransformer;
   }
   else{
     throw new std::invalid_argument("Transformer-type argument not implemented in TransformerFactory");

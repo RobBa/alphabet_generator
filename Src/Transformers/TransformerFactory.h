@@ -10,7 +10,7 @@
  */
 
 #include "TransformerBase.h"
-#include "BastaTransformer.h"
+#include "StreamingBastaTransformer.h"
 #include "PairwiseBastaTransformer.h"
 
 #include "GlobalParameters.h"

@@ -38,8 +38,8 @@ int main(int argc, char **argv){
   HelperFunctions::parseInput(argv[1]);
 
   // TODO: implement this is in a nicer factory design pattern
-  if(GlobalParameters::getInstance().getTransformerType() == TransformerType::BastaTransformer){
-    auto transformer = new BastaTransformer;
+  if(GlobalParameters::getInstance().getTransformerType() == TransformerType::StreamingBastaTransformer){
+    auto transformer = new StreamingBastaTransformer;
     transformer->convert();
     free(transformer);
   }

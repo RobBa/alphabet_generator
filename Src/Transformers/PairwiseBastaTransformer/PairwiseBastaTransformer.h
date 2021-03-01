@@ -3,7 +3,7 @@
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
  * @brief This transformer transforms a stream of data of specific format (e.g. netflows) 
  * into discrete integer-value sequences in abbadingo format. Unlike the normal 
- * BastaTransformer it builds pairs of source and IP addresses, and it outputs the entire
+ * StreamingBastaTransformer it builds pairs of source and IP addresses, and it outputs the entire
  * file.
  * 
  * The sequences can for example be used as an input alphabet for state machines. 
@@ -18,13 +18,13 @@
 #ifndef _PAIRWISE_BASTA_TRANSFORMER_
 #define _PAIRWISE_BASTA_TRANSFORMER_
 
-#include "BastaTransformer.h"
+#include "StreamingBastaTransformer.h"
 #include "FixedSizeWindow.h"
 #include "Host.h"
 
 #include <utility>
 
-class PairwiseBastaTransformer : public BastaTransformer {
+class PairwiseBastaTransformer : public StreamingBastaTransformer {
 private:
   /**
    * @brief Convenience, to save us paths in the main-ini file.
@@ -33,7 +33,9 @@ private:
   const std::string featureIniDir = "../Src/Transformers/PairwiseBastaTransformer/FeatureParameters/";
 
   void writeEntry(std::stringstream& stream) override;
+  
   void writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host) const;
+  void writeConnection(std::stringstream& stream, const std::string& hostAddress, const Host& host) const;
 
 public:   
   PairwiseBastaTransformer();

@@ -7,7 +7,7 @@ example.ini file is a commented example of how to write the .ini-files.
 The Src-folder has the main files. We call a concrete instance of an alphabet generator a 
 transformer, since it transforms raw data into an alphabet. All transformers must derive 
 from the abstract class TransformerBase. An example (including comments) is given via the 
-BastaTransformer. 
+StreamingBastaTransformer. 
 
 Each transformer has a window that groups data together, for example a window of fixed size
 and stride, grouping netflows together. The Windows are in the Window-directory in Src. Also,
