@@ -23,6 +23,8 @@ enum class BastaOutputFormat{
 
 class StreamingBastaFeatures : public FeatureBase {
 private:
+  int batchSize;
+
   friend class StreamingBastaTransformer;
 
   BastaOutputFormat ofFormat;
@@ -68,7 +70,7 @@ protected:
    * linesplit.
    * 
    */
-  int labelIndex;
+  int labelIndex = -1;
 
   /**
    * @brief Convenience field that helps us for several output formats.
@@ -110,6 +112,10 @@ public:
   void initFromFile(const std::string& filePath) override;
   void printLabels(const std::string& outFile) const noexcept;
 
+  inline const auto& getBatchSize() const {
+    return this->batchSize;
+  }
+
   inline const auto& getSourceAddressPair() const {
     return this->sourceAddressPair;
   }
@@ -134,7 +140,10 @@ public:
     return !this->labels.empty();
   }
 
-  inline const int getLabel(const std::string& label) const {
+  inline const int getLabel(const std::string& label) noexcept {
+    if(this->labels.count(label) == 0){
+      this->labels[label] = labels.size();
+    }
     return this->labels.at(label);
   }
 

@@ -100,6 +100,24 @@ protected:
   }
 
   /**
+   * @brief Convert a line to abbadingo format and returns that line.
+   * 
+   * @param symbols The input symbols to convert.
+   * @return const std::string The converted line as a string.
+   */
+  template<typename T>
+  const std::string toAbbadingoFormat(const std::vector<T>& symbols, const std::string& label) const {
+    std::stringstream res;
+    res << label << symbols.size();
+
+    for(const auto symbol: symbols){
+      res << " " << symbol;
+    }
+
+    return res.str();  
+  }
+
+  /**
   /**
    * @brief Convert a line to the augmented abbadingo format and returns that line.
    * 

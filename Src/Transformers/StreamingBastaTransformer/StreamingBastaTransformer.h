@@ -17,7 +17,7 @@
 #define _STREAMING_BASTA_TRANSFORMER_
 
 #include "TransformerBase.h"
-#include "FixedSizeWindow.h"
+#include "StochasticWindow.h"
 
 class StreamingBastaTransformer : public TransformerBase {
 private:
@@ -38,6 +38,7 @@ protected:
   StreamingBastaTransformer(bool derived) : TransformerBase(){};
   void writeEntry(std::stringstream& stream) override;
   unsigned int encodeStream(const std::string& stream) const;
+  unsigned int encodeStream(const std::vector<std::string>& stream) const;
 
 public:   
   StreamingBastaTransformer();

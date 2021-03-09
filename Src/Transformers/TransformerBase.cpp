@@ -41,9 +41,7 @@ TransformerBase::TransformerBase(){
   }
 
   inputStream.open(globalParameters.getInputFile(), std::ios_base::in);
-  std::string ofPath(globalParameters.getOutputFile());
-  const auto rawOfPath = HelperFunctions::splitString(ofPath, '.')[0];
-  outputStream.open(rawOfPath + ".txt", std::ios_base::out);
+  outputStream.open(globalParameters.getOutputFile(), std::ios_base::out);
 }
 
 /**

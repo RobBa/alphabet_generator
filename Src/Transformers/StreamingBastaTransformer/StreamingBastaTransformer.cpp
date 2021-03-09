@@ -32,6 +32,10 @@ StreamingBastaTransformer::StreamingBastaTransformer() : TransformerBase() {
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto& featureIniFile = globalParameters.getFeatureIni();
 
+  // this transformer only uses the stochastic window
+  delete this->window;
+  this->window = new StochasticWindow();
+
   transformParameters = new StreamingBastaFeatures;
   dynamic_cast<StreamingBastaFeatures*>(transformParameters)->initFromFile(featureIniDir + featureIniFile);
 
@@ -55,38 +59,22 @@ void StreamingBastaTransformer::convert(){
   int linecount = 0;
 
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
-
-    while(true){
-      if(inputStream.eof()){
-        break;
-      }
-
-      writeEntry(outStringStream);
-      linecount++;
-    }
-
-    if(outputFormat == BastaOutputFormat::Abbadingo){
-      outputStream << linecount << " " << alphabetSize << "\n";
-    }
-
-    outputStream << outStringStream.str();
-
-    outputStream.close();
-    inputStream.close();
+    // TODO: shall not exists
+    throw new std::invalid_argument("Not implemented in StreamingTransformer.");
   }
 
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
-    int counter = 0;
 
     while(true){
+      auto count = 0;
       writeEntry(outStringStream);
+      outputStream << outStringStream.str();
 
-      counter++;
-      if(counter >= 10){
-        counter = 0;
-        outputStream << outStringStream.str();
-        outStringStream.clear();
-        outputStream.flush();
+      outStringStream.clear();
+      outputStream.flush();
+      ++count;
+      if(count == 20){
+        break;
       }
     }
   }
@@ -108,6 +96,23 @@ void StreamingBastaTransformer::convert(){
  */
 unsigned int StreamingBastaTransformer::encodeStream(const std::string& stream) const {
   const auto& globalParameters = GlobalParameters::getInstance();
+  auto lineSplit = HelperFunctions::splitString(stream, globalParameters.getInputFileDelimiter());
+
+  return encodeStream(lineSplit);
+}
+
+/**
+ * @brief This method encodes streams, such as e.g. netflows. As a pre-
+ * requisite, the internals should be set at this moment, e.g. the 
+ * transformParameters and the featureMap.
+ * 
+ * Algorithm follows pattern as depicted in "Learning Behavioral Fingerprints 
+ * From Netflows Using Timed Automata" (Pellegrino et al., 2017)
+ * 
+ * @param stream The netflow as a vector of strings.
+ * @return int The encoded netflow.
+ */
+unsigned int StreamingBastaTransformer::encodeStream(const std::vector<std::string>& stream) const {
   const auto featureTypeMap = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getFeatureTypeMap();
   const auto featureIndexMap = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getFeatureindexMap();
 
@@ -122,12 +127,10 @@ unsigned int StreamingBastaTransformer::encodeStream(const std::string& stream) 
   } 
 
   auto spaceSize = static_cast<unsigned int>(transformParametersCasted->getAllCategoricalDataSize()) * static_cast<unsigned int>(transformParametersCasted->getAllRangeValueSize());
-
-  auto lineSplit = HelperFunctions::splitString(stream, globalParameters.getInputFileDelimiter());
   
   for(const auto& feature: featureTypeMap){
     const int index = featureIndexMap.at(feature.first);
-    const auto& rawValue = lineSplit.at(index);
+    const auto& rawValue = stream.at(index);
 
     if(feature.second == FeatureBase::FeatureType::categorical){
       /* TODO: the three lines below do not make sense, since for this method we need to know our spaceSize beforehand. Either we preprocess the 
@@ -152,66 +155,58 @@ unsigned int StreamingBastaTransformer::encodeStream(const std::string& stream) 
 
 /**
  * @brief Write an entry to the stream. Side effect: 
- * Keeps track of the alphabet size, i.e. updates the alphabet size if
- * we find a new element.
  * 
- * @param inputStream The input stream.
+ * @param stream The stream to write to.
  * @return const std::string The string.
  */
 void StreamingBastaTransformer::writeEntry(std::stringstream& stream){
+  using SeparatedLine = std::vector<std::string>;
+
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto featureInformation = dynamic_cast<StreamingBastaFeatures*>(transformParameters);
-  const auto& outputFormat = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getOutputFormat();
 
-  const auto& featureIndexMap = featureInformation->getFeatureindexMap();
-  const auto& sourceAddress = featureInformation->getSourceAddressPair();
-  static bool filterBySourceAddress = featureInformation->filterBySourceAddress();
+  const auto& outputFormat = featureInformation->getOutputFormat();
+  const static auto batchSize = featureInformation->getBatchSize();
+  const static auto labelIndex = featureInformation->getLabelIndex();
 
-  if(outputFormat == BastaOutputFormat::Abbadingo){
-    std::vector<unsigned int> symbols;
+  // map dst-address to pair with label as int and vector of readily-split netflows
+  static std::map< std::string, std::pair<int, std::vector<SeparatedLine> > > batch; 
 
-    std::vector<std::string> lines = window->getWindow(inputStream);
-    if(lines.empty()){
-      return;
-    }
-
-    // convert the lines into a line in abbadingo
-    for(auto& line: lines){
-      if(line.empty()){
-        continue;
-      }
-
-      const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
-      if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
-        continue;
-      }
-
-      const auto code = encodeStream(line);
-      alphabetSize = std::max(alphabetSize, code); // TODO: a good way to do?
-      symbols.push_back(code);
-    }
-
-    stream << toAbbadingoFormat(symbols);
-  }
-
-  else if(outputFormat == BastaOutputFormat::AugmentedAbbadingo){
-    std::string line;
-    getline(inputStream, line);
-    if(line.empty()){
-      return;
-    }
+  // collect a batch
+  for(auto i = 0; i < batchSize; ++i){
+    auto line = dynamic_cast<StochasticWindow*>(window)->getStreamedLine(inputStream);
 
     const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
-    if(filterBySourceAddress && !(lineSplit.at(sourceAddress->second) == sourceAddress->first)){
-      return;
-    }
+    auto& dst = batch[lineSplit.at(featureInformation->getDstIndex())];
+    dst.second.push_back(lineSplit);
 
-    const auto code = encodeStream(line);
-    stream << toAugmentedAbbadingoFormat(lineSplit[sourceAddress->second], lineSplit[featureInformation->getDstIndex()], 
-                                         featureInformation->getAllFeatureNames(), code, lineSplit[featureInformation->getLabelIndex()]);
+    if(labelIndex > -1){
+      const auto label = dst.first;
+      dst.first = std::max(label, featureInformation->getLabel(lineSplit.at(labelIndex)));
+    }
   }
 
-  else{
-    throw new std::invalid_argument("Output format not implemented in StreamingBastaTransformer.");
+  // stream the batch
+  for(auto& dst: batch){
+    std::stringstream labelStream;
+
+    const auto label = dst.second.first;
+    if(labelIndex > -1){
+      labelStream << label << " ";
+    }
+
+    unsigned int lineCount = 0;
+    std::vector<unsigned int> symbols;
+
+    const auto& flows = dst.second.second;
+    for(const auto& flow: flows){
+      if(flow.empty()){
+        continue;
+      }
+
+      const auto code = encodeStream(flow);
+      symbols.push_back(code);
+    }
+    stream << toAbbadingoFormat(symbols, labelStream.str()) << "\n";
   }
 };

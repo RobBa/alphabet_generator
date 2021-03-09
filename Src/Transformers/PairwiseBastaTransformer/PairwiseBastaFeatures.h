@@ -36,6 +36,10 @@ public:
     return this->hosts;
   }
 
+  inline const int getLabel(const std::string& label) {
+    return this->labels.at(label);
+  }
+
   inline const auto filterByDestination() const {
     return this->filterByDst;
   }

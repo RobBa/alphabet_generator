@@ -74,13 +74,7 @@ void StreamingBastaFeatures::initFromFile(const std::string& filePath){
       }
       this->setRanges(feature, ranges);
     }
-    else if(feature == "Label"){
-      const auto& labels = HelperFunctions::splitString(std::string(category), ',', true);
-      int i = 0;
-      for(const auto& label: labels){
-        this->labels[label] = i;
-        ++i;
-      }
+    else if(feature == "LabelIndex"){
       this->labelIndex = std::stoi(value);
     }
 
@@ -100,6 +94,10 @@ void StreamingBastaFeatures::initFromFile(const std::string& filePath){
         continue;
       }
       this->sourceAddressPair->second = index;
+    }
+
+    else if(feature == "BatchSize"){
+      this->batchSize = std::stoi(value);
     }
 
     else if(feature == "DstIndex"){
