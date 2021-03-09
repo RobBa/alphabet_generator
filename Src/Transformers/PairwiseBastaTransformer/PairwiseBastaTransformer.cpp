@@ -19,6 +19,8 @@
 #include <set>
 #include <cassert>
 
+#include <iostream>
+
 /**
  * @brief The constructor.
  * 
@@ -61,20 +63,29 @@ void PairwiseBastaTransformer::convert(){
 
       writeConnection(outStringStream, hostAddress, host);
       outputStream << outStringStream.str();
-      outputStream.flush();
+      outputStream.close();
     }
     else{
+      unsigned int hostNumber = 0;
+      const auto& outputFile = globalParameters.getOutputFile();
+
       for(const auto& host: hosts){
-        writeConnection(outStringStream, host);
+        outputStream.open(outputFile + "_host_" + std::to_string(hostNumber) + ".txt");
+        outputStream << host.first << "\n";
+
+        static auto featureString = getFeatureString(featureParameters->getAllFeatureNames());
+        outputStream << "Encoded features:" << featureString << "\n";
+
+        writeConnection(outStringStream, host, hostNumber);
 
         outputStream << outStringStream.str();
-        outStringStream.clear();
         outputStream.flush();
+        outputStream.close();
+
+        outStringStream.clear();
+        ++hostNumber;
       }
     }   
-
-    outputStream.close();
-    inputStream.close();
   }
 
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
@@ -106,23 +117,23 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
   static auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
 
   const auto& ipAddress = host.first;
-  const auto label = host.second.getLabel();
 
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
-    for(auto& dst: host.second.getNetflows()){
-      std::stringstream dstString;
+    for(auto& dst: host.second.getLabeledNetflows()){
+      //std::stringstream dstString;
       std::stringstream symbolString;
 
       stream << ipAddress << " <-> " << dst.first << "\n";
-      stream << featureString << "\n";
+      stream << "Encoded features: " << featureString << "\n";
+
+      const auto& label = host.second.getLabel(dst.first);
 
       unsigned int lineCount = 0;
       std::set<unsigned int> symbolSet; // keep track of size of alphabet for this host
-
       std::vector<unsigned int> symbols;
 
       dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
-      auto flows = dst.second;
+      auto flows = dst.second.second;
 
       while(!flows.empty()){
         auto lines = dynamic_cast<FixedSizeWindow*>(window)->getWindow(flows); // TODO: we could spare the copy here
@@ -167,22 +178,22 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
 
   static const bool filterByDst = featureInformation->filterByDestination();
 
-  const auto label = host.getLabel();
-
   if(globalParameters.getStreamMode() == StreamMode::BatchMode){
     stream << "Host address: " << hostAddress << "\n";
-    stream << "Features: " << featureString << "\n";
+    stream << "Encoded features: " << featureString << "\n";
 
     unsigned int lineCount = 0;
 
     std::unordered_map<unsigned int, unsigned int> symbolSet; // keep track of size of alphabet for this host
     std::stringstream symbolString;
 
-    for(auto& dst: host.getNetflows()){
+    for(auto& dst: host.getLabeledNetflows()){
       std::vector<unsigned int> symbols;
 
       dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
-      auto flows = dst.second;
+      auto flows = dst.second.second;
+
+      const auto& label = host.getLabel(dst.first);
 
       while(!flows.empty()){
         auto lines = dynamic_cast<FixedSizeWindow*>(window)->getWindow(flows); // TODO: we could spare the copy here
@@ -208,5 +219,62 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
       }
     }
     stream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
+  }
+}
+
+/**
+ * @brief Converts entire connection and writes it into the stream.
+ * 
+ * Creates a new file for each source-destination pair.
+ * 
+ * @param stream Stream to write to.
+ * @param host The host we will transform to a string.
+ */
+void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host, const unsigned int hostNumber) const {
+  const auto& globalParameters = GlobalParameters::getInstance();
+  const auto& outputFile = globalParameters.getOutputFile();
+
+  const auto featureInformation = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
+  static const auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
+
+  const auto& ipAddress = host.first;
+
+  unsigned int dstNumber = 0;
+  for(auto& dst: host.second.getLabeledNetflows()){
+    //std::ofstream pairOutStream(outputFile + "_host_" + std::to_string(hostNumber) + "_dst_" + std::to_string(dstNumber) + ".txt");
+    std::stringstream symbolString;
+
+    const auto& label = host.second.getLabel(dst.first);
+
+    //pairOutStream << ipAddress << " <-> " << dst.first << "\n";
+    //pairOutStream << "Encoded features:" << featureString << "\n";
+
+    unsigned int lineCount = 0;
+    std::set<unsigned int> symbolSet; // keep track of size of alphabet for this host
+    std::vector<unsigned int> symbols;
+
+    dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
+    auto flows = dst.second.second;
+
+    while(!flows.empty()){
+      auto lines = dynamic_cast<FixedSizeWindow*>(window)->getWindow(flows); // TODO: we could spare the copy here
+      for(auto& line: lines){
+        if(line.empty()){
+          continue;
+        }
+
+        const auto code = encodeStream(line);
+        symbols.push_back(code);
+        symbolSet.insert(code);
+      }
+      ++lineCount;
+    }
+    symbolString << toAbbadingoFormat(symbols, label);
+    stream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
+    //pairOutStream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
+    //pairOutStream.close();
+
+    symbols.clear();
+    ++dstNumber;
   }
 }

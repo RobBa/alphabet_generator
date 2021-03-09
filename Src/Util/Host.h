@@ -21,14 +21,21 @@
  * 
  */
 class Host{
+  // The netflow with the destination along with a label of type T (templated).
+  using DstPair = std::pair<int, std::vector<std::string> >;
+
 private:
   /**
    * @brief Mapping the netflows, dst-address to a vector of netflows.
    * 
    */
-  std::unordered_map<std::string, std::vector<std::string> > netflows;
+  std::unordered_map<std::string, std::vector<std::string> > unlabeledNetflows;
 
-  int label = 0;
+  /**
+   * @brief Mapping the netflows, dst-address to a labeled vector of netflows.
+   * 
+   */
+  std::unordered_map<std::string, DstPair> labeledNetflows;
 
 public:
   Host() = default;
@@ -38,16 +45,16 @@ public:
   
   std::vector<std::string> getConnection(const std::string& dstAddress) const;
 
-  inline auto getNetflows() const {
-    return this->netflows;
+  inline auto getLabeledNetflows() const {
+    return this->labeledNetflows;
   }
 
-  inline void setlabel(int label) noexcept {
-    this->label = label;
+  inline void setlabel(std::string dstAddress, const int label) noexcept {
+    labeledNetflows.at(dstAddress).first = label;
   }
 
-  inline const auto getLabel() const noexcept {
-    return label;
+  inline const auto& getLabel(std::string dstAddress) const {
+    return labeledNetflows.at(dstAddress).first;
   }
 };
 

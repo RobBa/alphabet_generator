@@ -95,7 +95,6 @@ protected:
     for(const auto symbol: symbols){
       res << " " << symbol;
     }
-    res << "\n";
 
     return res.str();  
   }

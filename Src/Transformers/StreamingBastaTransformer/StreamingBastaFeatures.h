@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef _BASTA_FEATURES_
-#define _BASTA_FEATURES_
+#ifndef _STREAMING_BASTA_FEATURES_
+#define _STREAMING_BASTA_FEATURES_
 
 #include "FeatureBase.h"
 
@@ -108,6 +108,7 @@ public:
   }
 
   void initFromFile(const std::string& filePath) override;
+  void printLabels(const std::string& outFile) const noexcept;
 
   inline const auto& getSourceAddressPair() const {
     return this->sourceAddressPair;

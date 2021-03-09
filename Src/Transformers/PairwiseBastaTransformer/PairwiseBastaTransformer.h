@@ -36,9 +36,15 @@ private:
   
   void writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host) const;
   void writeConnection(std::stringstream& stream, const std::string& hostAddress, const Host& host) const;
+  void writeConnection(std::stringstream& stream, const std::pair< std::string, Host >& host, const unsigned int hostNumber) const;
 
 public:   
   PairwiseBastaTransformer();
+
+  ~PairwiseBastaTransformer(){
+      inputStream.close();
+  }
+
   virtual void convert() override;
 };
 

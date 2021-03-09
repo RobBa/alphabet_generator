@@ -13,8 +13,8 @@
  * 
  */
 
-#ifndef _BASTA_TRANSFORMER_
-#define _BASTA_TRANSFORMER_
+#ifndef _STREAMING_BASTA_TRANSFORMER_
+#define _STREAMING_BASTA_TRANSFORMER_
 
 #include "TransformerBase.h"
 #include "FixedSizeWindow.h"

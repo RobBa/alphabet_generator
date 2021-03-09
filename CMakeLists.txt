@@ -18,5 +18,5 @@ include_directories( "${PROJECT_SOURCE_DIR}/Src"
                      "${PROJECT_SOURCE_DIR}/Util"
                      )
 
-add_subdirectory(Util)
 add_subdirectory(Src)
+add_subdirectory(Util)

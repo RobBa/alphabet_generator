@@ -66,7 +66,7 @@ void PairwiseBastaFeatures::initFromFile(const std::string& filePath){
     }
     else if(feature == "Label"){
       const auto& labels = HelperFunctions::splitString(std::string(category), ',', true);
-      int i = 0;
+      int i = 1;
       for(const auto& label: labels){
         this->labels[label] = i;
         ++i;
@@ -148,11 +148,17 @@ void PairwiseBastaFeatures::preprocessInput(std::ifstream& inputStream){
     // inefficient, but compatible with later code.
     const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     const auto& sourceAddress = lineSplit[sourceAddressPair->second];
+
+    const auto& rawLabel = lineSplit[labelIndex];
+    if(labels.count(rawLabel) == 0){
+      labels[rawLabel] = labels.size();
+    }
+
     if(!labels.empty()){
-      const auto& rawLabel = lineSplit[labelIndex];
       hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line, labels[rawLabel]);
     }
     else{
+      // TODO: what to do when we do not want labeled output here?
       hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line);
     }
   }

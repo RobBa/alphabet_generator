@@ -138,6 +138,17 @@ void StreamingBastaFeatures::initFromFile(const std::string& filePath){
   }
 }
 
+void StreamingBastaFeatures::printLabels(const std::string& outFile) const noexcept {
+  std::ofstream outStream(outFile);
+
+  outStream << "Labels:\n";
+  for(const auto& label: this->labels){
+    outStream << label.first << ": " << label.second << "\n";
+  }
+
+  outStream.close();
+}
+
 
 /**
  * @brief Returns the assigned integer value of the category and name. 

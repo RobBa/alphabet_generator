@@ -18,7 +18,7 @@
  * @param netflow The netflow.
  */
 void Host::addNetflow(const std::string& ipAddress, const std::string& netflow){
-  netflows[ipAddress].push_back(netflow);
+  unlabeledNetflows[ipAddress].push_back(netflow);
 }
 
 /**
@@ -28,8 +28,9 @@ void Host::addNetflow(const std::string& ipAddress, const std::string& netflow){
  * @param netflow The netflow.
  */
 void Host::addNetflow(const std::string& ipAddress, const std::string& netflow, const int label){
-  netflows[ipAddress].push_back(netflow);
-  if(label != 0 && this->label == 0){
-    this->label = label;
+  if(labeledNetflows.count(ipAddress) == 0){
+    labeledNetflows[ipAddress] = std::make_pair(label, std::vector<std::string>(0));
   }
+  labeledNetflows[ipAddress].first = std::max(labeledNetflows[ipAddress].first, label);
+  labeledNetflows[ipAddress].second.push_back(netflow);
 }
