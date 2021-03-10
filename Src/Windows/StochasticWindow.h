@@ -20,8 +20,6 @@ class StochasticWindow : public WindowBase{
 private:
   bool initialized;
 
-  void resetStreamState(std::ifstream& inputStream) const;
-
 public:
   StochasticWindow() : WindowBase(1) {};
 

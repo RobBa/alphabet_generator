@@ -42,7 +42,10 @@ StreamingBastaTransformer::StreamingBastaTransformer() : TransformerBase() {
   if(transformParameters->hasHeader()){
     // skip one line, so we don't read in header accidentally
     std::string line;
-    getline(inputStream, line);
+    while(line.empty()){
+      HelperFunctions::resetStreamState(inputStream);
+      getline(inputStream, line);
+    }
   }
 }
 
@@ -64,7 +67,7 @@ void StreamingBastaTransformer::convert(){
   }
 
   else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
-
+    outputStream << "0 0\n"; // to avoid clashes with flexfringe
     while(true){
       auto count = 0;
       writeEntry(outStringStream);

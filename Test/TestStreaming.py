@@ -67,7 +67,7 @@ if __name__ == "__main__":
                                                  append_output argument not set.')
 
   parser.add_argument('--append_output', type=bool, default=False, help='If true, then outfile will be appended, rather than overwritten, if it exists.')
-  parser.add_argument('--delay', type=float, default=500.0, help='The delay in ms between each new line that will be written.')
+  parser.add_argument('--delay', type=float, default=100.0, help='The delay in ms between each new line that will be written.')
   parser.add_argument('--converter_ini', type=str, default=None, help='The path to the .ini-file of the AlphabetConverter. If given,\
                                                                        an instance of the alphabet converter will be launched in a subprocess, \
                                                                        and a conversion will start.')

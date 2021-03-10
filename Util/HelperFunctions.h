@@ -19,6 +19,8 @@ namespace HelperFunctions{
   void removeChars( /*out*/ std::string& input, const char rmChar);
   void replaceCharacters( /*out*/ std::string& input, const char targetChar, const char replacement);
 
+  void resetStreamState(std::ifstream& inputStream);
+
   std::vector<std::string> splitString(const std::string& input, const char delimiter);
   std::vector<std::string> splitString(std::string& input, const char delimiter, bool replaceTabs);
   std::vector<std::string> splitString(std::string&& input, const char delimiter, bool replaceTabs);

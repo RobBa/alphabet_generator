@@ -13,6 +13,24 @@
 
 #include <sstream>
 #include <algorithm>
+#include <fstream>
+
+/**
+ * @brief Resets the stream state, avoing eof-problems.
+ * 
+ * @param inputStream The stream.
+ */
+void HelperFunctions::resetStreamState(std::ifstream& inputStream){
+  if(inputStream.eof()){
+    try{
+        inputStream.setstate(std::ios_base::goodbit);
+        inputStream.clear();
+    }
+    catch(std::istream::failure e) {
+        throw new std::runtime_error("Problem opening/reading/closing file in inputdata::reset_stream_state()");
+    }
+  }
+}
 
 /**
  * @brief Splits string and returns vector of string. 

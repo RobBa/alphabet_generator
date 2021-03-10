@@ -11,6 +11,7 @@
  */
 
 #include "StochasticWindow.h"
+#include "HelperFunctions.h"
 
 #include <string>
 #include <sstream>
@@ -27,7 +28,7 @@ std::string StochasticWindow::getStreamedLine(std::ifstream& inputStream) const 
   std::string line;
     
   while(true){
-    resetStreamState(inputStream);
+    HelperFunctions::resetStreamState(inputStream);
     getline(inputStream, line);
     if(line.empty()){
       continue;
@@ -52,21 +53,4 @@ std::vector<std::string> StochasticWindow::getWindow(std::ifstream& inputStream)
 
   res.push_back(std::move(line));
   return res;
-}
-
-/**
- * @brief Resets the stream state, avoing eof-problems.
- * 
- * @param inputStream The stream.
- */
-void StochasticWindow::resetStreamState(std::ifstream& inputStream) const {
-  if(inputStream.eof()){
-    try{
-        inputStream.setstate(std::ios_base::goodbit);
-        inputStream.clear();
-    }
-    catch(std::istream::failure e) {
-        throw new std::runtime_error("Problem opening/reading/closing file in inputdata::reset_stream_state()");
-    }
-  }
 }
