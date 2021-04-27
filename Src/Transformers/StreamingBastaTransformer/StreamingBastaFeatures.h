@@ -23,8 +23,8 @@ enum class BastaOutputFormat{
 
 class StreamingBastaFeatures : public FeatureBase {
 private:
-  int batchSize;
 
+  // TODO: get rid of the inheritance here
   friend class StreamingBastaTransformer;
 
   BastaOutputFormat ofFormat;
@@ -39,6 +39,7 @@ private:
   }
 
 protected:
+  int batchSize;
 
   /**
    * @brief Convenience field, if we want to filter input parse by specific 

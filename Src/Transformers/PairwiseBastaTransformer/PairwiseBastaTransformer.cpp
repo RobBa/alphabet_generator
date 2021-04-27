@@ -32,6 +32,8 @@ PairwiseBastaTransformer::PairwiseBastaTransformer() : StreamingBastaTransformer
   transformParameters = new PairwiseBastaFeatures;
   dynamic_cast<PairwiseBastaFeatures*>(transformParameters)->initFromFile(featureIniDir + featureIniFile);
 
+  this->window = new StochasticWindow;
+
   if(transformParameters->hasHeader()){
     // skip one line, so we don't read in header accidentally
     std::string line;
@@ -48,51 +50,40 @@ PairwiseBastaTransformer::PairwiseBastaTransformer() : StreamingBastaTransformer
 void PairwiseBastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
-
   const auto featureParameters = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
 
-  std::stringstream outStringStream;
+  const auto& hosts = featureParameters->getHosts();
+  const auto filterBySourceAddress = featureParameters->filterBySourceAddress();
 
-  if(globalParameters.getStreamMode() == StreamMode::BatchMode){
-    const auto hosts = featureParameters->getHosts();
-    const auto filterBySourceAddress = featureParameters->filterBySourceAddress();
+  if(filterBySourceAddress){
+    std::ofstream outstream(globalParameters.getOutputFile(), std::ios_base::out);
 
-    if(filterBySourceAddress){
-      const auto& hostAddress = featureParameters->getSourceAddressPair()->first;
-      const auto& host = hosts.at(hostAddress);
+    const auto& hostAddress = featureParameters->getSourceAddressPair()->first;
+    const auto& host = hosts.at(hostAddress);
 
-      writeConnection(outStringStream, hostAddress, host);
-      outputStream << outStringStream.str();
-      outputStream.close();
-    }
-    else{
-      unsigned int hostNumber = 0;
-      const auto& outputFile = globalParameters.getOutputFile();
-
-      for(const auto& host: hosts){
-        outputStream.open(outputFile + "_host_" + std::to_string(hostNumber) + ".txt");
-        outputStream << host.first << "\n";
-
-        static auto featureString = getFeatureString(featureParameters->getAllFeatureNames());
-        outputStream << "Encoded features:" << featureString << "\n";
-
-        writeConnection(outStringStream, host, hostNumber);
-
-        outputStream << outStringStream.str();
-        outputStream.flush();
-        outputStream.close();
-
-        outStringStream.clear();
-        ++hostNumber;
-      }
-    }   
-  }
-
-  else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
-    throw new std::invalid_argument("Stream mode not implemented in PairwiseBastaTransformer.");
+    std::stringstream outStringStream;
+    writeConnection(outStringStream, hostAddress, host);
+    outstream << outStringStream.str();
+    outstream.close();
   }
   else{
-    throw new std::invalid_argument("Requested streaming mode not implemented");
+    unsigned int hostNumber = 0;
+    const auto& outputFile = globalParameters.getOutputFile();
+    const auto featureString = getFeatureString(featureParameters->getAllFeatureNames());
+
+    for(const auto& host: hosts){
+      std::ofstream outstream(outputFile + "_host_" + std::to_string(hostNumber) + ".txt");
+      outstream << host.first << "\n";
+
+      std::stringstream outStringStream;
+      outstream << "Encoded features:" << featureString << "\n";
+
+      writeConnection(outStringStream, host, hostNumber);
+      outstream << outStringStream.str();
+      outstream.close();
+
+      ++hostNumber;
+    }   
   }
 }
 
@@ -237,44 +228,54 @@ void PairwiseBastaTransformer::writeConnection(std::stringstream& stream, const 
   const auto featureInformation = dynamic_cast<PairwiseBastaFeatures*>(transformParameters);
   static const auto featureString = getFeatureString(featureInformation->getAllFeatureNames());
 
+  const auto batchSize = featureInformation->getBatchSize();
+  if(batchSize <= 0){
+    std::cerr << "Batch size must be set and be larger than zero to run this mode." << std::endl;
+    throw new std::runtime_error("Batchsize should be larger than 0 when this function is called.");
+  }
+
   const auto& ipAddress = host.first;
-
-  unsigned int dstNumber = 0;
+  std::set<unsigned int> symbolSet; // keep track of size of alphabet for this host(src)-dst pair
+  std::vector<unsigned int> symbols;
   for(auto& dst: host.second.getLabeledNetflows()){
-    //std::ofstream pairOutStream(outputFile + "_host_" + std::to_string(hostNumber) + "_dst_" + std::to_string(dstNumber) + ".txt");
     std::stringstream symbolString;
+    int lineCount = 0;
+    int batchCounter = 0;
+    std::vector< std::string > batch;
 
-    const auto& label = host.second.getLabel(dst.first);
+    const auto& flows = dst.second.second;
+    for(int i = 0; i < flows.size(); ++i){
+      const auto& flow = flows.at(i);
+      // collect a batch
+      batch.push_back(flow);
+      ++batchCounter;
+      if(batchCounter == batchSize || i == flows.size() - 1){
+        batchCounter = 0;
+      }
+      else{
+        continue;
+      }
 
-    //pairOutStream << ipAddress << " <-> " << dst.first << "\n";
-    //pairOutStream << "Encoded features:" << featureString << "\n";
+      // stream the batch
+      std::stringstream labelStream;
+      const auto& label = host.second.getLabel(dst.first);
+      labelStream << label << " ";
 
-    unsigned int lineCount = 0;
-    std::set<unsigned int> symbolSet; // keep track of size of alphabet for this host
-    std::vector<unsigned int> symbols;
-
-    dynamic_cast<FixedSizeWindow*>(window)->setIsInitialized(false);
-    auto flows = dst.second.second;
-
-    while(!flows.empty()){
-      auto lines = dynamic_cast<FixedSizeWindow*>(window)->getWindow(flows); // TODO: we could spare the copy here
-      for(auto& line: lines){
-        if(line.empty()){
+      std::vector<unsigned int> symbols;
+      for(const auto& flow: batch){
+        if(flow.empty()){
           continue;
         }
 
-        const auto code = encodeStream(line);
-        symbols.push_back(code);
+        const auto code = encodeStream(flow);
         symbolSet.insert(code);
+        symbols.push_back(code);
       }
+      symbolString << toAbbadingoFormat(symbols, labelStream.str()) << "\n";
       ++lineCount;
+      batch.clear();
+      batch.resize(0);
     }
-    symbolString << toAbbadingoFormat(symbols, label);
     stream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
-    //pairOutStream << lineCount << " " << symbolSet.size() << "\n" << symbolString.str() << "\n";
-    //pairOutStream.close();
-
-    symbols.clear();
-    ++dstNumber;
   }
 }

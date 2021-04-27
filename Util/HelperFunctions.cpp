@@ -33,6 +33,30 @@ void HelperFunctions::resetStreamState(std::ifstream& inputStream){
 }
 
 /**
+ * @brief Get a line of a streamed file. We only need this in stream mode.
+ * 
+ * @param input_stream The streamed file as an input stream.
+ * @return string The line as a string.
+ */
+std::stringstream HelperFunctions::getStreamedLine(std::ifstream &input_stream){
+    std::stringstream res;
+    std::string line;
+    
+    while(true){
+        HelperFunctions::resetStreamState(input_stream);
+        getline(input_stream, line);
+        if(line.empty()){
+            continue;
+        }
+        res << move(line) << "\n";
+        line.clear();
+        if(!input_stream.eof()){
+            return res;
+        }
+    }
+}
+
+/**
  * @brief Splits string and returns vector of string. 
  * 
  * @param input The input string.

@@ -96,6 +96,10 @@ void PairwiseBastaFeatures::initFromFile(const std::string& filePath){
       this->dstAddressIndex = std::stoi(value);
     }
 
+    else if(feature == "BatchSize"){
+      this->batchSize = std::stoi(value);
+    }
+
     else if(feature == "HasHeader"){
       if(value == "true"){
         this->setHasHeader(true);
@@ -149,17 +153,17 @@ void PairwiseBastaFeatures::preprocessInput(std::ifstream& inputStream){
     const auto lineSplit = HelperFunctions::splitString(line, globalParameters.getInputFileDelimiter(), true);
     const auto& sourceAddress = lineSplit[sourceAddressPair->second];
 
-    const auto& rawLabel = lineSplit[labelIndex];
-    if(labels.count(rawLabel) == 0){
-      labels[rawLabel] = labels.size();
-    }
+    //const auto& rawLabel = lineSplit[labelIndex];
+    //if(labels.count(rawLabel) == 0){
+    //  labels[rawLabel] = labels.size();
+    //}
 
-    if(!labels.empty()){
-      hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line, labels[rawLabel]);
-    }
-    else{
+    //if(!labels.empty()){
+      hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line, 0);
+    // }
+    //else{
       // TODO: what to do when we do not want labeled output here?
-      hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line);
-    }
+    //  hosts[sourceAddress].addNetflow(lineSplit[dstAddressIndex], line);
+    //}
   }
 }

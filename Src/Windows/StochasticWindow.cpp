@@ -2,7 +2,7 @@
  * @file StochasticWindow.cpp
  * @author Robert Baumgartner (r.baumgartner-1@tudelft.nl)
  * @brief A window of size 1 and stride 1. Used to collect batches.
- *  * 
+ * 
  * @version 0.1
  * @date 2021-03-09
  * 

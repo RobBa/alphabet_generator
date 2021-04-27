@@ -26,7 +26,6 @@ class TransformerBase{
 protected:
 
   std::ifstream inputStream;
-  std::ofstream outputStream;
 
   WindowBase* window;
   FeatureBase* transformParameters;
@@ -52,7 +51,6 @@ public:
     free(transformParameters);
 
     inputStream.close();
-    outputStream.close();
   }
   
   /**

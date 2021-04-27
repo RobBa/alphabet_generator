@@ -57,33 +57,25 @@ void StreamingBastaTransformer::convert(){
   // TODO: check the mode (batch, stream) here, and keep on rolling the ball until finished
   const auto& globalParameters = GlobalParameters::getInstance();
   const auto& outputFormat = dynamic_cast<StreamingBastaFeatures*>(transformParameters)->getOutputFormat();
+  std::ofstream outputStream(globalParameters.getOutputFile(), std::ios_base::out);
 
   std::stringstream outStringStream;
   int linecount = 0;
 
-  if(globalParameters.getStreamMode() == StreamMode::BatchMode){
-    // TODO: shall not exists
-    throw new std::invalid_argument("Not implemented in StreamingTransformer.");
-  }
+  outputStream << "0 0\n"; // to avoid clashes with flexfringe
+  while(true){
+    auto count = 0;
+    writeEntry(outStringStream);
+    outputStream << outStringStream.str();
 
-  else if(globalParameters.getStreamMode() == StreamMode::StreamMode){
-    outputStream << "0 0\n"; // to avoid clashes with flexfringe
-    while(true){
-      auto count = 0;
-      writeEntry(outStringStream);
-      outputStream << outStringStream.str();
-
-      outStringStream.clear();
-      outputStream.flush();
-      ++count;
-      if(count == 20){
-        break;
-      }
+    outStringStream.clear();
+    outputStream.flush();
+    ++count;
+    if(count == 20){
+      break;
     }
   }
-  else{
-    throw new std::invalid_argument("Requested streaming mode not implemented");
-  }
+
 }
 
 /**

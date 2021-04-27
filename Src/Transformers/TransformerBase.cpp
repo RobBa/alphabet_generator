@@ -41,7 +41,6 @@ TransformerBase::TransformerBase(){
   }
 
   inputStream.open(globalParameters.getInputFile(), std::ios_base::in);
-  outputStream.open(globalParameters.getOutputFile(), std::ios_base::out);
 }
 
 /**
